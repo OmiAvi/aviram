@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin — aviram.app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050302;--fg:#f4ece4;--dim:rgba(244,236,228,.5);--line:rgba(244,236,228,.14);--card:#0e0a08;--accent:#ff5a00;--bad:#ff4d4d;--ok:#5fd38d;
+  --disp:"PP Neue Montreal","Neue Montreal","Inter Tight","Helvetica Neue",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:13px/1.5 var(--mono);-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,textarea,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+.mono-up{text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+
+/* login */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+#login form{width:min(380px,100%)}
+#login h1{font:500 56px/0.9 var(--disp);letter-spacing:-.05em;margin-bottom:8px}
+#login h1 i{color:var(--accent)}
+#login p{color:var(--dim);margin-bottom:24px}
+
+/* layout */
+header{position:sticky;top:0;z-index:10;background:rgba(5,3,2,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{max-width:1040px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font:600 18px var(--disp);letter-spacing:-.02em}
+.brand span{color:var(--accent);font-style:italic;font-weight:500}
+#status{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-right:auto}
+#status.dirty{color:var(--accent)}
+nav.tabs{max-width:1040px;margin:0 auto;padding:0 20px;display:flex;gap:4px}
+nav.tabs button{padding:10px 14px;border-bottom:2px solid transparent;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+nav.tabs button.on{color:var(--fg);border-color:var(--accent)}
+main{max-width:1040px;margin:0 auto;padding:24px 20px 120px}
+h2{font:500 36px/1 var(--disp);letter-spacing:-.04em;margin-bottom:6px}
+.lead{color:var(--dim);margin-bottom:20px;max-width:640px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);padding:9px 13px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;transition:.15s;white-space:nowrap;cursor:pointer;background:transparent}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#000;font-weight:500}
+.btn.primary:hover{background:var(--fg);border-color:var(--fg);color:#000}
+.btn.primary:disabled{opacity:.35;cursor:default;background:var(--accent);color:#000;border-color:var(--accent)}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+.btn.sm{padding:6px 9px;font-size:10px}
+.btn input[type=file]{display:none}
+
+label.f{display:block;margin-bottom:12px}
+label.f > span{display:block;color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+input[type=text],input[type=url],input[type=email],input[type=password],textarea,select{width:100%;background:#000;border:1px solid var(--line);padding:10px 11px;outline:none;border-radius:0;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:70px}
+.grid{display:grid;gap:0 12px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.drop{border:1px dashed var(--line);padding:22px;text-align:center;color:var(--dim);margin-bottom:16px;transition:.15s}
+.drop.on{border-color:var(--accent);color:var(--accent);background:rgba(255,90,0,.06)}
+.banner{border:1px solid var(--accent);padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.banner p{color:var(--fg);max-width:620px}
+
+ol.list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.item{background:var(--card);border:1px solid var(--line);transition:border-color .15s,opacity .15s}
+.item.drag{opacity:.4}
+.item.over{border-color:var(--accent)}
+.item.open{border-color:rgba(255,90,0,.5)}
+.head{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.handle{cursor:grab;color:var(--dim);font-size:16px;padding:4px;user-select:none;touch-action:none}
+.thumb{width:96px;aspect-ratio:16/9;background:#000;flex:none;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:9px;text-transform:uppercase;overflow:hidden}
+.thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.sum{flex:1;min-width:0}
+.sum b{display:block;font:500 20px/1.15 var(--disp);letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sum b i{font-style:normal;color:var(--accent);font-family:var(--mono);font-size:11px;margin-right:8px;letter-spacing:0}
+.sum small{color:var(--dim);font-size:11px}
+.acts{display:flex;gap:4px;flex:none}
+.body{padding:4px 16px 16px;border-top:1px solid var(--line)}
+.body .grid{margin-top:14px}
+.vid{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:16px;align-items:start;margin:14px 0 16px;padding:14px;border:1px solid var(--line);background:#000}
+.vid video{width:100%;max-height:260px;background:#111;display:block}
+.vid .none{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:10px;text-transform:uppercase;background:#111}
+.vid .path{color:var(--dim);font-size:11px;word-break:break-all;margin-bottom:10px}
+.vid .row{display:flex;gap:6px;flex-wrap:wrap}
+.prog{height:22px;position:relative;border:1px solid var(--line);margin-top:10px;overflow:hidden}
+.prog i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);width:0;transition:width .2s}
+.prog span{position:relative;padding:0 8px;line-height:20px;font-size:10px;text-transform:uppercase;mix-blend-mode:difference}
+.foot{display:flex;justify-content:space-between;gap:8px;margin-top:4px;flex-wrap:wrap}
+.warn{color:var(--accent);font-size:11px;margin-top:8px}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--dim);font-weight:400;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+td.k{word-break:break-all}
+.pill{display:inline-block;padding:2px 6px;border:1px solid var(--line);font-size:10px;text-transform:uppercase}
+.pill.ok{border-color:var(--ok);color:var(--ok)}
+
+.linkrow{display:grid;grid-template-columns:160px 1fr auto;gap:8px;margin-bottom:8px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:var(--fg);color:#000;padding:11px 15px;font-size:12px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast.err{background:var(--bad);color:#fff}
+.err-text{color:var(--bad);margin-top:10px;min-height:20px}
+
+@media(max-width:720px){
+  .g2,.g3,.g4{grid-template-columns:1fr 1fr}
+  .vid{grid-template-columns:1fr}
+  .thumb{width:64px}
+  .sum b{font-size:16px}
+  .acts .hide-sm{display:none}
+  .linkrow{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<section id="login" hidden>
+  <form id="loginForm">
+    <h1>Admin<br><i>aviram.app</i></h1>
+    <p id="loginNote">Enter your admin password.</p>
+    <label class="f"><span>Password</span><input type="password" id="pw" autocomplete="current-password" required autofocus></label>
+    <button class="btn primary" type="submit">Log in →</button>
+    <div class="err-text" id="loginErr"></div>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header>
+    <div class="bar">
+      <div class="brand">aviram.app <span>admin</span></div>
+      <div id="status">All changes saved</div>
+      <a class="btn" href="/" target="_blank" rel="noopener">View site ↗</a>
+      <button class="btn primary" id="save" disabled>Save</button>
+      <button class="btn" id="logout">Log out</button>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="clips" class="on">Clips</button>
+      <button data-tab="apps">Apps</button>
+      <button data-tab="profile">Profile</button>
+      <button data-tab="library">Library</button>
+    </nav>
+  </header>
+
+  <main>
+    <section data-panel="clips">
+      <h2>Clips</h2>
+      <p class="lead">The videos in your reel, top to bottom. Drag ⠿ to reorder, open one to edit it. Uploading a video saves right away; everything else waits for Save.</p>
+      <div id="migrate" class="banner" hidden>
+        <p><b id="migrateCount"></b> served from the site bundle. Move them to R2 so they stream properly on iPhone and can be replaced from here.</p>
+        <button class="btn primary" id="migrateBtn">Move to R2</button>
+      </div>
+      <div class="drop" id="drop">Drop video files here to add new clips — or <label class="btn sm">choose files<input type="file" id="addFiles" accept="video/*" multiple></label> <button class="btn sm" id="addBlank">+ Add without video</button></div>
+      <ol class="list" id="clips"></ol>
+    </section>
+
+    <section data-panel="apps" hidden>
+      <h2>Apps</h2>
+      <p class="lead">The "Also builds" cards at the end of the reel.</p>
+      <div class="toolbar"><button class="btn" id="addApp">+ Add app</button></div>
+      <ol class="list" id="apps"></ol>
+    </section>
+
+    <section data-panel="profile" hidden>
+      <h2>Profile</h2>
+      <p class="lead">Your name, the intro lines, and the contact links on the last screen.</p>
+      <div id="profile"></div>
+    </section>
+
+    <section data-panel="library" hidden>
+      <h2>Library</h2>
+      <p class="lead">Every video stored in R2. Delete ones no clip uses to free space.</p>
+      <div class="toolbar"><button class="btn" id="refreshLib">Refresh</button><span id="libTotal" style="color:var(--dim)"></span></div>
+      <table><thead><tr><th>File</th><th>Size</th><th>Used by</th><th></th></tr></thead><tbody id="lib"></tbody></table>
+    </section>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const mb = b => (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB';
+const SCENES = ['runner', 'spiral', 'bust', 'skyline', 'tunnel', 'field', 'grid', 'pickle', 'pulse', 'hero'];
+const FORMATS = ['16:9', '9:16', '4:3', '1:1', '4:5', '2.39:1'];
+const CHUNK = 10 * 1024 * 1024;
+
+let site = null, savedJSON = '', busy = 0;
+const open = new WeakSet();
+
+/* ---------------- api ---------------- */
+async function api(path, opts = {}) {
+  const headers = { 'x-aviram': '1', ...(opts.json !== undefined ? { 'content-type': 'application/json' } : {}), ...(opts.headers || {}) };
+  const res = await fetch(path, { method: opts.method || 'GET', headers, body: opts.json !== undefined ? JSON.stringify(opts.json) : opts.body, credentials: 'same-origin' });
+  let data = null;
+  try { data = await res.json(); } catch {}
+  if (res.status === 401 && path !== '/api/login') { showLogin('Your session ended — log in again.'); throw new Error('Not logged in'); }
+  if (!res.ok) throw new Error((data && data.error) || `Request failed (${res.status})`);
+  return data;
+}
+
+let toastT;
+function toast(msg, err) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => (t.className = ''), err ? 6000 : 2600);
+}
+
+/* ---------------- auth ---------------- */
+function showLogin(note) {
+  $('#app').hidden = true; $('#login').hidden = false;
+  if (note) $('#loginNote').textContent = note;
+  $('#pw').focus();
+}
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault(); $('#loginErr').textContent = '';
+  try { await api('/api/login', { method: 'POST', json: { password: $('#pw').value } }); $('#pw').value = ''; await start(); }
+  catch (err) { $('#loginErr').textContent = err.message; }
+};
+$('#logout').onclick = async () => {
+  if (dirty() && !confirm('You have unsaved changes. Log out anyway?')) return;
+  await api('/api/logout', { method: 'POST' }).catch(() => {});
+  savedJSON = JSON.stringify(site); showLogin('Logged out.');
+};
+
+async function boot() {
+  const me = await fetch('/api/me').then(r => r.json()).catch(() => ({}));
+  if (!me.configured) return showLogin('Admin isn\'t set up yet: run  npx wrangler secret put ADMIN_PASSWORD  and reload.');
+  if (!me.admin) return showLogin();
+  await start();
+}
+async function start() {
+  site = await fetch('/api/site', { cache: 'no-store' }).then(r => r.json());
+  site.projects ||= []; site.apps ||= []; site.links ||= [];
+  savedJSON = JSON.stringify(site);
+  $('#login').hidden = true; $('#app').hidden = false;
+  renderAll(); markDirty();
+}
+
+/* ---------------- save ---------------- */
+const dirty = () => JSON.stringify(site) !== savedJSON;
+function markDirty() {
+  const d = dirty();
+  $('#save').disabled = !d || busy > 0;
+  $('#status').textContent = busy ? 'Uploading…' : d ? 'Unsaved changes' : 'All changes saved';
+  $('#status').classList.toggle('dirty', d || busy > 0);
+}
+async function save(quiet) {
+  $('#save').disabled = true; $('#status').textContent = 'Saving…';
+  try {
+    const { site: clean } = await api('/api/site', { method: 'PUT', json: site });
+    // keep local object identities (open cards) but take server-cleaned values
+    clean.projects.forEach((p, i) => Object.assign(site.projects[i], p));
+    clean.apps.forEach((a, i) => Object.assign(site.apps[i], a));
+    Object.assign(site, { ...clean, projects: site.projects, apps: site.apps });
+    savedJSON = JSON.stringify(site);
+    if (!quiet) toast('Saved — live on aviram.app');
+  } catch (err) { if (err.message !== 'Not logged in') toast(err.message, true); }
+  markDirty(); renderAll();
+}
+$('#save').onclick = () => save();
+addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); if (dirty() && !busy) save(); } });
+addEventListener('beforeunload', e => { if (site && (dirty() || busy)) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------------- tabs ---------------- */
+$('#tabs').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $$('[data-panel]').forEach(p => (p.hidden = p.dataset.panel !== b.dataset.tab));
+  if (b.dataset.tab === 'library') loadLibrary();
+};
+
+/* ---------------- render ---------------- */
+function renderAll() { renderClips(); renderApps(); renderProfile(); }
+
+const field = (label, key, val, type = 'text', extra = '') =>
+  `<label class="f"><span>${label}</span><input type="${type}" data-k="${key}" value="${esc(val)}" ${extra}></label>`;
+const select = (label, key, val, opts) =>
+  `<label class="f"><span>${label}</span><select data-k="${key}">${[...new Set([val, ...opts].filter(Boolean))].map(o => `<option ${o === val ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
+const area = (label, key, val) => `<label class="f"><span>${label}</span><textarea data-k="${key}" rows="2">${esc(val)}</textarea></label>`;
+
+function clipHTML(p, i) {
+  const meta = [p.client, p.year, p.runtime, p.format].filter(Boolean).join(' · ') || 'No details yet';
+  return `<li class="item ${open.has(p) ? 'open' : ''}" data-i="${i}">
+    <div class="head">
+      <span class="handle" draggable="true" title="Drag to reorder">⠿</span>
+      <div class="thumb">${p.video ? `<video src="${esc(p.video)}#t=2" preload="metadata" muted playsinline></video>` : 'No video'}</div>
+      <div class="sum"><b><i>${pad(i + 1)}</i>${esc(p.title)}</b><small>${esc(meta)}</small></div>
+      <div class="acts">
+        <button class="btn sm hide-sm" data-act="up" title="Move up" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="btn sm hide-sm" data-act="down" title="Move down" ${i === site.projects.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="btn sm" data-act="toggle">${open.has(p) ? 'Close' : 'Edit'}</button>
+      </div>
+    </div>
+    ${open.has(p) ? `<div class="body">
+      <div class="grid g2">${field('Title', 'title', p.title)}${field('Client', 'client', p.client)}</div>
+      <div class="grid g4">${field('Year', 'year', p.year)}${field('Role', 'role', p.role)}${field('Runtime', 'runtime', p.runtime, 'text', 'placeholder="0:45"')}${select('Format', 'format', p.format, FORMATS)}</div>
+      ${area('One-line description', 'blurb', p.blurb)}
+      <div class="vid">
+        ${p.video ? `<video src="${esc(p.video)}" controls preload="metadata" playsinline></video>` : `<div class="none">No video yet</div>`}
+        <div>
+          <div class="path">${p.video ? esc(p.video) : 'Upload a video and the reel will depth-scan it.'}</div>
+          <div class="row">
+            <label class="btn">${p.video ? 'Replace video' : 'Upload video'}<input type="file" accept="video/*" data-upload></label>
+            ${p.video ? `<button class="btn danger" data-act="unvideo">Remove video</button>` : ''}
+          </div>
+          <div class="prog" hidden><i></i><span></span></div>
+          ${select('Shape shown if there is no video', 'scene', p.scene, SCENES)}
+        </div>
+      </div>
+      <div class="foot"><button class="btn danger" data-act="delete">Delete clip</button><button class="btn" data-act="toggle">Done</button></div>
+    </div>` : ''}
+  </li>`;
+}
+function renderClips() {
+  $('#clips').innerHTML = site.projects.map(clipHTML).join('') || `<li style="color:var(--dim);padding:20px 0">No clips yet — drop a video above.</li>`;
+  const bundled = site.projects.filter(p => (p.video || '').startsWith('/videos/')).length;
+  $('#migrate').hidden = !bundled;
+  $('#migrateCount').textContent = `${bundled} clip${bundled === 1 ? ' is' : 's are'}`;
+}
+
+function appHTML(a, i) {
+  return `<li class="item ${open.has(a) ? 'open' : ''}" data-i="${i}">
+    <div class="head">
+      <div class="sum"><b><i>${pad(i + 1)}</i>${esc(a.name)}</b><small>${esc(a.tag || '')}${a.url ? ' · ' + esc(a.url) : ''}</small></div>
+      <div class="acts">
+        <button class="btn sm" data-act="up" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="btn sm" data-act="down" ${i === site.apps.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="btn sm" data-act="toggle">${open.has(a) ? 'Close' : 'Edit'}</button>
+      </div>
+    </div>
+    ${open.has(a) ? `<div class="body">
+      <div class="grid g2">${field('Name', 'name', a.name)}${field('Label', 'tag', a.tag, 'text', 'placeholder="iOS app"')}</div>
+      ${field('Link', 'url', a.url, 'url', 'placeholder="https://"')}
+      ${area('One-line description', 'line', a.line)}
+      <div class="grid g2">${select('Background shape', 'scene', a.scene, SCENES)}</div>
+      <div class="foot"><button class="btn danger" data-act="delete">Delete app</button><button class="btn" data-act="toggle">Done</button></div>
+    </div>` : ''}
+  </li>`;
+}
+function renderApps() { $('#apps').innerHTML = site.apps.map(appHTML).join(''); }
+
+function renderProfile() {
+  $('#profile').innerHTML = `
+    <div class="grid g3">${field('Name', 'name', site.name)}${field('Role line', 'role', site.role)}${field('Location line', 'base', site.base)}</div>
+    ${area('About (last screen)', 'about', site.about)}
+    ${field('Email (shown publicly)', 'email', site.email, 'email', 'placeholder="you@aviram.app"')}
+    <label class="f"><span>Links</span></label>
+    <div id="links">${site.links.map((l, i) => `<div class="linkrow" data-i="${i}"><input type="text" data-lk="label" value="${esc(l.label)}" placeholder="Instagram"><input type="url" data-lk="url" value="${esc(l.url)}" placeholder="https://"><button class="btn danger sm" data-act="rmlink">Remove</button></div>`).join('')}</div>
+    <button class="btn sm" data-act="addlink">+ Add link</button>`;
+}
+
+/* ---------------- editing ---------------- */
+function listOf(el) { return el.closest('#clips') ? site.projects : el.closest('#apps') ? site.apps : null; }
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.lk) { site.links[+t.closest('.linkrow').dataset.i][t.dataset.lk] = t.value; return markDirty(); }
+  if (!t.dataset.k) return;
+  const li = t.closest('.item');
+  if (li) {
+    const list = listOf(li), item = list[+li.dataset.i]; item[t.dataset.k] = t.value;
+    // refresh the summary line without re-rendering (keeps focus)
+    const isClip = list === site.projects;
+    const html = isClip ? clipHTML(item, +li.dataset.i) : appHTML(item, +li.dataset.i);
+    const tmp = document.createElement('div'); tmp.innerHTML = html;
+    li.querySelector('.sum').replaceWith(tmp.querySelector('.sum'));
+  } else if (t.closest('#profile')) site[t.dataset.k] = t.value;
+  markDirty();
+});
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'addlink') { site.links.push({ label: '', url: '' }); renderProfile(); markDirty(); return; }
+  if (act === 'rmlink') { site.links.splice(+b.closest('.linkrow').dataset.i, 1); renderProfile(); markDirty(); return; }
+  const li = b.closest('.item'); if (!li) return;
+  const list = listOf(li), i = +li.dataset.i, item = list[i];
+  const rerender = list === site.projects ? renderClips : renderApps;
+  if (act === 'toggle') { open.has(item) ? open.delete(item) : open.add(item); }
+  if (act === 'up' && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
+  if (act === 'down' && i < list.length - 1) [list[i + 1], list[i]] = [list[i], list[i + 1]];
+  if (act === 'delete') {
+    if (!confirm(`Delete "${item.title || item.name}"? ${item.video ? 'Its video stays in the Library until you delete it there.' : ''}`)) return;
+    list.splice(i, 1);
+  }
+  if (act === 'unvideo') item.video = '';
+  rerender(); markDirty();
+});
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.upload !== undefined && t.files[0]) {
+    const li = t.closest('.item'); const p = site.projects[+li.dataset.i];
+    uploadInto(p, t.files[0], li);
+  }
+});
+
+/* drag to reorder (clips) */
+let dragI = null;
+$('#clips').addEventListener('dragstart', e => {
+  const li = e.target.closest('.item'); if (!li || !e.target.classList.contains('handle')) return;
+  dragI = +li.dataset.i; li.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'clip');
+  e.dataTransfer.setDragImage(li, 20, 20);
+});
+$('#clips').addEventListener('dragover', e => {
+  if (dragI === null) return; e.preventDefault();
+  $$('#clips .item').forEach(x => x.classList.toggle('over', x === e.target.closest('.item')));
+});
+$('#clips').addEventListener('drop', e => {
+  if (dragI === null) return; e.preventDefault(); e.stopPropagation();
+  const li = e.target.closest('.item'); if (li) {
+    const to = +li.dataset.i; const [moved] = site.projects.splice(dragI, 1); site.projects.splice(to, 0, moved);
+  }
+  dragI = null; renderClips(); markDirty();
+});
+$('#clips').addEventListener('dragend', () => { dragI = null; $$('#clips .item').forEach(x => x.classList.remove('drag', 'over')); });
+
+/* ---------------- adding clips ---------------- */
+const nice = name => name.replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').replace(/\b(hype|vid|video|final|export)\b/gi, '').replace(/\s+/g, ' ').trim().replace(/\b\w/g, c => c.toUpperCase()) || 'Untitled';
+function newClip(title) {
+  const last = site.projects[0] || {};
+  return { title, client: last.client || '', year: String(new Date().getFullYear()), role: last.role || 'Edit', runtime: '', format: '16:9', blurb: '', scene: 'runner', video: '' };
+}
+$('#addBlank').onclick = () => { const p = newClip('New clip'); site.projects.unshift(p); open.add(p); renderClips(); markDirty(); };
+$('#addFiles').onchange = e => { addFiles([...e.target.files]); e.target.value = ''; };
+const drop = $('#drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { if (dragI !== null) return; e.preventDefault(); drop.classList.add('on'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('on')));
+drop.addEventListener('drop', e => { if (dragI !== null) return; e.preventDefault(); addFiles([...e.dataTransfer.files]); });
+async function addFiles(files) {
+  const vids = files.filter(f => f.type.startsWith('video/'));
+  if (!vids.length) return toast('Those aren\'t video files.', true);
+  const added = vids.map(f => { const p = newClip(nice(f.name)); site.projects.unshift(p); open.add(p); return [p, f]; }).reverse();
+  renderClips(); markDirty();
+  for (const [p, f] of added) {
+    const li = $(`#clips .item[data-i="${site.projects.indexOf(p)}"]`);
+    await uploadInto(p, f, li);
+  }
+}
+
+/* ---------------- uploading ---------------- */
+function probe(file) {
+  return new Promise(res => {
+    const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true;
+    const url = URL.createObjectURL(file);
+    v.onloadedmetadata = () => { res({ d: v.duration, w: v.videoWidth, h: v.videoHeight }); URL.revokeObjectURL(url); };
+    v.onerror = () => { res(null); URL.revokeObjectURL(url); };
+    v.src = url;
+  });
+}
+const fmtOf = (w, h) => { const r = w / h; return r < .7 ? '9:16' : r < .9 ? '4:5' : r < 1.1 ? '1:1' : r < 1.5 ? '4:3' : r < 2 ? '16:9' : '2.39:1'; };
+const runOf = d => `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}`;
+
+async function uploadInto(p, file, li) {
+  if (!file.type.startsWith('video/')) return toast('That isn\'t a video file.', true);
+  if (file.size > 300 * 1048576 && !confirm(`${file.name} is ${mb(file.size)}. Viewers download the whole thing, so a 720p export under ~40 MB plays much better. Upload anyway?`)) return;
+  busy++; markDirty();
+  const setProg = (f, label) => {
+    const el = li && document.body.contains(li) ? li : $(`#clips .item[data-i="${site.projects.indexOf(p)}"]`);
+    const pr = el && $('.prog', el); if (!pr) return;
+    pr.hidden = false; $('i', pr).style.width = (f * 100).toFixed(1) + '%'; $('span', pr).textContent = label;
+  };
+  let up;
+  try {
+    const meta = await probe(file);
+    up = await api('/api/uploads', { method: 'POST', json: { name: file.name, type: file.type || 'video/mp4', size: file.size } });
+    const parts = []; const total = Math.ceil(file.size / CHUNK);
+    for (let n = 1; n <= total; n++) {
+      const blob = file.slice((n - 1) * CHUNK, n * CHUNK);
+      let part, tries = 0;
+      while (!part) {
+        try { part = await api(`/api/uploads/part?key=${encodeURIComponent(up.key)}&uploadId=${encodeURIComponent(up.uploadId)}&n=${n}`, { method: 'PUT', body: blob }); }
+        catch (err) { if (++tries >= 3) throw err; await new Promise(r => setTimeout(r, 1000 * tries)); }
+      }
+      parts.push({ partNumber: part.partNumber, etag: part.etag });
+      setProg(n / total, `Uploading ${file.name} — ${Math.round(n / total * 100)}% of ${mb(file.size)}`);
+    }
+    const done = await api('/api/uploads/complete', { method: 'POST', json: { key: up.key, uploadId: up.uploadId, parts } });
+    p.video = done.url;
+    if (meta && meta.d) { p.runtime = runOf(meta.d); p.format = fmtOf(meta.w, meta.h); }
+    busy--; renderClips(); await save(true);
+    toast(`${file.name} uploaded — live on aviram.app`);
+    if (file.size > 60 * 1048576) toast(`Uploaded. Heads up: ${mb(file.size)} is heavy for the web — a 720p export under ~40 MB loads faster.`);
+  } catch (err) {
+    busy = Math.max(0, busy - 1);
+    if (up) api('/api/uploads/abort', { method: 'POST', json: { key: up.key, uploadId: up.uploadId } }).catch(() => {});
+    if (err.message !== 'Not logged in') toast(`Upload failed: ${err.message}`, true);
+    renderClips(); markDirty();
+  }
+}
+
+/* ---------------- migrate bundled clips ---------------- */
+$('#migrateBtn').onclick = async () => {
+  const todo = site.projects.filter(p => (p.video || '').startsWith('/videos/'));
+  const btn = $('#migrateBtn'); btn.disabled = true; busy++; markDirty();
+  try {
+    for (const [k, p] of todo.entries()) {
+      btn.textContent = `Moving ${k + 1} / ${todo.length}…`;
+      const r = await api('/api/migrate', { method: 'POST', json: { path: p.video } });
+      p.video = r.url;
+    }
+    busy--; await save(true); toast(`Moved ${todo.length} clips to R2.`);
+  } catch (err) { busy = Math.max(0, busy - 1); toast(`Move failed: ${err.message}`, true); }
+  btn.disabled = false; btn.textContent = 'Move to R2'; renderClips(); markDirty();
+};
+
+/* ---------------- library ---------------- */
+async function loadLibrary() {
+  $('#lib').innerHTML = `<tr><td colspan="4" style="color:var(--dim)">Loading…</td></tr>`;
+  try {
+    const { items } = await api('/api/media');
+    const users = url => site.projects.filter(p => p.video === url).map(p => p.title);
+    const total = items.reduce((a, b) => a + b.size, 0);
+    $('#libTotal').textContent = `${items.length} files · ${mb(total)}`;
+    $('#lib').innerHTML = items.sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded)).map(it => {
+      const used = users(it.url);
+      return `<tr><td class="k"><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.key.replace(/^media\//, ''))}</a></td><td>${mb(it.size)}</td>
+        <td>${used.length ? `<span class="pill ok">${esc(used.join(', '))}</span>` : '<span class="pill">Unused</span>'}</td>
+        <td style="text-align:right"><button class="btn sm danger" data-del="${esc(it.key)}" data-used="${used.length}">Delete</button></td></tr>`;
+    }).join('') || `<tr><td colspan="4" style="color:var(--dim)">Nothing in R2 yet.</td></tr>`;
+  } catch (err) { $('#lib').innerHTML = `<tr><td colspan="4" class="err-text">${esc(err.message)}</td></tr>`; }
+}
+$('#refreshLib').onclick = loadLibrary;
+$('#lib').onclick = async e => {
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  const used = +b.dataset.used;
+  if (!confirm(used ? 'A clip still uses this video — it will show a placeholder shape instead. Delete permanently?' : 'Delete this video permanently?')) return;
+  try {
+    await api('/api/media?key=' + encodeURIComponent(b.dataset.del), { method: 'DELETE' });
+    if (used) { site.projects.forEach(p => { if (p.video === '/' + b.dataset.del) p.video = ''; }); await save(true); }
+    toast('Deleted.'); loadLibrary(); renderClips();
+  } catch (err) { toast(err.message, true); }
+};
+
+boot();
+</script>
+</body>
+</html>

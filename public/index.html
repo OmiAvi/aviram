@@ -284,8 +284,21 @@ const CONFIG = {
   ],
 };
 
+/* Live content: on aviram.app the admin's saved content (/api/site) replaces the
+   defaults above. Anywhere else (or if the request fails) the defaults are used. */
+async function loadSite(){
+  try{
+    const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),3500);
+    const r=await fetch('/api/site',{signal:ctl.signal,cache:'no-store'}); clearTimeout(t);
+    if(r.ok && (r.headers.get('content-type')||'').includes('json')){ const d=await r.json(); if(d && Array.isArray(d.projects)) Object.assign(CONFIG,d); }
+  }catch(e){}
+}
+loadSite().then(main);
+function main(){
+
 /* ===================================================================== */
 const $ = s => document.querySelector(s);
+const esc = v => String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const hash = n => { const s = Math.sin(n)*43758.5453; return s - Math.floor(s); };
 const pad = (n,l=2)=>String(n).padStart(l,'0');
@@ -550,16 +563,16 @@ function build(){
   const [first,...rest]=CONFIG.name.split(' ');
   const tc=w=>w.charAt(0)+w.slice(1).toLowerCase();
   add(`<div class="live">● Live depth · <i>${N.toLocaleString()}</i> points · ${COLS}×${ROWS}</div>
-       <div class="who"><h1>${tc(first)}<br><em>${rest.map(tc).join(' ')}</em></h1><p>${CONFIG.role}<br>${CONFIG.base}</p></div>
+       <div class="who"><h1>${esc(tc(first))}<br><em>${esc(rest.map(tc).join(' '))}</em></h1><p>${esc(CONFIG.role)}<br>${esc(CONFIG.base)}</p></div>
        <div class="cue">Scroll to scan ↓</div>`,'hero',{scene:'hero'},'Intro',{p:[0,0,14],l:[0,0,0]});
   P.forEach((p,i)=>{
     const r=i%2===1;
     const s=add(`<div class="pbox">
         <div class="pnum">${pad(i+1)}</div>
-        <div class="ptop">Clip ${pad(i+1)} / ${pad(P.length)} — ${p.format} — ${p.runtime}</div>
-        <h2 class="ptitle">${p.title}</h2>
-        <p class="pblurb">${p.blurb}</p>
-        <dl class="specs"><div><dt>Client</dt><dd>${p.client}</dd></div><div><dt>Year</dt><dd>${p.year}</dd></div><div><dt>Role</dt><dd>${p.role}</dd></div><div><dt>Runtime</dt><dd>${p.runtime}</dd></div></dl>
+        <div class="ptop">Clip ${pad(i+1)} / ${pad(P.length)} — ${esc(p.format)} — ${esc(p.runtime)}</div>
+        <h2 class="ptitle">${esc(p.title)}</h2>
+        <p class="pblurb">${esc(p.blurb)}</p>
+        <dl class="specs"><div><dt>Client</dt><dd>${esc(p.client)}</dd></div><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
         <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:`<button class="btn" data-link="${i}">+ Link clip</button>`}</div>
         <div class="linked" data-linked="${i}"></div>
       </div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
@@ -568,18 +581,18 @@ function build(){
   });
   add(`<div class="panel"><div class="shead"><h2>File index</h2><span>${P.length} clips · hover to preview</span></div>
        <div class="row h"><span>№</span><span>Title</span><span>Client</span><span>Role</span><span>Year</span><span>Run</span></div>
-       ${P.map((p,i)=>`<div class="row" data-row="${i}"><span class="n">${pad(i+1)}</span><span class="t">${p.title}</span><span>${p.client}</span><span>${p.role}</span><span>${p.year}</span><span>${p.runtime}</span></div>`).join('')}
+       ${P.map((p,i)=>`<div class="row" data-row="${i}"><span class="n">${pad(i+1)}</span><span class="t">${esc(p.title)}</span><span>${esc(p.client)}</span><span>${esc(p.role)}</span><span>${esc(p.year)}</span><span>${esc(p.runtime)}</span></div>`).join('')}
        </div>`,'index',{scene:'field'},'Index',{p:[0,7.5,9.5],l:[0,-.5,0]});
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
-       ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${a.url}" target="_blank" rel="noopener"`:''}><small>${a.tag}</small><div><h3>${a.name}</h3><p>${a.line}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
+       ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
-  const links=[...CONFIG.links.filter(l=>l.url).map(l=>`<a class="btn" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`)];
-  if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${CONFIG.email}">${CONFIG.email}</a>`);
-  add(`<h2>End of <b>tape.</b></h2><p>${CONFIG.about}</p>
+  const links=[...(CONFIG.links||[]).filter(l=>l.url).map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)];
+  if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`);
+  add(`<h2>End of <b>tape.</b></h2><p>${esc(CONFIG.about)}</p>
        <div class="links"><button class="btn" id="rewind">◀◀ Rewind</button>${links.join('')}</div>
-       <div class="copy">© ${new Date().getFullYear()} ${CONFIG.name}</div>`,'end',{scene:'hero'},'End',{p:[0,0,24],l:[0,0,0]});
+       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'End',{p:[0,0,24],l:[0,0,0]});
 
-  const rail=$('#rail'); rail.innerHTML=sections.map((s,i)=>`<button data-go="${i}"><span>${pad(i+1)} ${s.name}</span><i></i></button>`).join('');
+  const rail=$('#rail'); rail.innerHTML=sections.map((s,i)=>`<button data-go="${i}"><span>${pad(i+1)} ${esc(s.name)}</span><i></i></button>`).join('');
   $('#secTot').textContent=pad(sections.length);
 }
 build();
@@ -797,6 +810,7 @@ $('#enter').onclick=()=>{
   state.entered=true; enterAt=performance.now(); sfx.init(); $('#boot').classList.add('gone'); document.body.classList.remove('locked');
   scrollTo(0,0); U.uScatter.value=1.6;
 };
+} // main
 </script>
 </body>
 </html>
