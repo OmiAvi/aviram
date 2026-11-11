@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "depth-reel",
+  "compatibility_date": "2026-11-01",
+  // Static site: everything in ./public is served as-is. No Worker script needed.
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}
