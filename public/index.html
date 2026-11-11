@@ -81,7 +81,7 @@ main{position:relative;z-index:10;transition:opacity .5s}
 .ptop{color:var(--accentText);font-size:10px;text-transform:uppercase;margin-bottom:8px}
 .ptitle{font-family:var(--disp);font-weight:500;font-size:clamp(46px,7vw,104px);line-height:.92;letter-spacing:-.045em;margin-bottom:16px}
 .pblurb{color:var(--dim);line-height:1.7;margin-bottom:18px;font-size:12px}
-.specs{display:grid;grid-template-columns:repeat(4,auto);gap:4px 22px;margin-bottom:22px;text-transform:uppercase;font-size:10px;justify-content:start}
+.specs{display:grid;grid-template-columns:repeat(3,auto);gap:4px 22px;margin-bottom:22px;text-transform:uppercase;font-size:10px;justify-content:start}
 .proj.r .specs{justify-content:end}
 .specs dt{color:var(--dim)}
 .specs dd{font-weight:500}
@@ -160,8 +160,14 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
 .bootbox{width:min(460px,86vw)}
 .bootbox h1{font-family:var(--disp);font-weight:500;font-size:68px;line-height:.9;letter-spacing:-.05em;margin-bottom:8px;text-transform:none}
 .bootbox h1 i{font-style:italic;color:var(--accentText)}
+.bootbox .what{text-transform:none;letter-spacing:-.005em;font-family:var(--disp);font-size:16px;line-height:1.45;margin:-10px 0 14px;max-width:440px}
+.bootbox .what b{color:var(--accentText);font-weight:500}
+.bootbox .how{list-style:none;display:grid;grid-template-columns:1fr;gap:4px 16px;font-size:10px;color:var(--dim);margin-bottom:18px}
+.bootbox .how b{color:var(--fg);font-weight:500}
+.bootbox .how li::before{content:"→ ";color:var(--accentText)}
+@media (max-width:760px){.bootbox h1{font-size:56px}.bootbox .what{font-size:15px}}
 .bootbox .sub{color:var(--dim);font-size:10px;margin-bottom:26px}
-.blines{font-size:11px;line-height:2;min-height:110px;color:var(--dim)}
+.blines{font-size:11px;line-height:1.9;min-height:64px;color:var(--dim)}
 .blines b{color:var(--accentText);font-weight:500}
 .bbar{height:2px;background:var(--line);margin:18px 0 24px;position:relative;overflow:hidden}
 .bbar i{position:absolute;inset:0;width:0;background:var(--accent);transition:width .15s}
@@ -177,7 +183,7 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
   .hud{padding:14px}
   .brand span,.readout .x{display:none}
   .rail{display:none}
-  .specs{grid-template-columns:repeat(2,auto)}
+  .specs{grid-template-columns:repeat(3,auto)}
   .row{grid-template-columns:34px 1fr 60px}
   .row > :nth-child(3),.row > :nth-child(4),.row > :nth-child(5){display:none}
   .cards{grid-template-columns:1fr}
@@ -207,6 +213,25 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
   body.theater.v-split #thVideoWrap{width:46vw}
   body.theater.v-split.tall #thVideoWrap{width:34vw}
 }
+/* scanner cursor (mouse/trackpad only) */
+#cur{position:fixed;left:0;top:0;z-index:100;pointer-events:none;opacity:0;transition:opacity .2s}
+body.cur-on #cur{opacity:1}
+@media (hover:hover) and (pointer:fine){ body.cur-on, body.cur-on *{cursor:none!important} }
+#cur .ring,#cur .dot,#cur .lbl{position:fixed;left:0;top:0;will-change:transform}
+#cur .ring{width:34px;height:34px;margin:-17px 0 0 -17px;transition:width .25s,height .25s,margin .25s}
+#cur .ring::before{content:"";position:absolute;inset:0;border-radius:50%;border:1.5px dotted var(--accentText);animation:curspin 6s linear infinite}
+#cur .ring::after{content:"";position:absolute;inset:-6px;background:
+  linear-gradient(var(--accentText),var(--accentText)) 50% 0/1.5px 6px no-repeat,
+  linear-gradient(var(--accentText),var(--accentText)) 50% 100%/1.5px 6px no-repeat,
+  linear-gradient(var(--accentText),var(--accentText)) 0 50%/6px 1.5px no-repeat,
+  linear-gradient(var(--accentText),var(--accentText)) 100% 50%/6px 1.5px no-repeat}
+#cur .dot{width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--fg);box-shadow:0 0 8px var(--accent)}
+#cur .lbl{margin:14px 0 0 22px;font:500 9px var(--mono);letter-spacing:.1em;color:var(--fg);text-transform:uppercase;white-space:nowrap;text-shadow:0 0 6px var(--bg),0 0 2px var(--bg);transition:opacity .2s}
+body.cur-hot #cur .ring{width:52px;height:52px;margin:-26px 0 0 -26px}
+body.cur-hot #cur .lbl{opacity:0}
+body.cur-hold #cur .ring{width:20px;height:20px;margin:-10px 0 0 -10px}
+body.cur-hold #cur .ring::before{border-style:solid;animation-duration:1s}
+@keyframes curspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.fx .grain{animation:none}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -219,6 +244,8 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
   <div class="bootbox">
     <h1>Depth<br><i>Reel</i></h1>
     <div class="sub">Omer Aviram — video portfolio</div>
+    <p class="what">A <b>depth scan</b> turns video into thousands of dots floating in 3D. The brighter a pixel, the closer its dot sits to you, so every frame of these edits becomes something you can move through.</p>
+    <ul class="how"><li><b>Scroll</b> to scan each clip</li><li><b>Move</b> your cursor or finger to push the dots</li><li><b>Hold</b> anywhere to see the real colors</li><li><b>Play footage</b> to watch the actual video</li></ul>
     <div class="blines" id="blines"></div>
     <div class="bbar"><i id="bfill"></i></div>
     <button id="enter">▶ Enter the scan</button>
@@ -260,6 +287,7 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
 <div id="thVideoWrap"></div>
 <div id="videoBin"></div>
 
+<div id="cur" aria-hidden="true"><i class="ring"></i><i class="dot"></i><span class="lbl">Z —</span></div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -439,7 +467,7 @@ function sparkle(c,t,amt){
 
 /* ---------- a depth source: procedural scene or a video ---------- */
 class Source{
-  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:false});
+  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:true});
     this.tex=new THREE.CanvasTexture(this.cv); this.tex.minFilter=THREE.LinearFilter; this.tex.magFilter=THREE.LinearFilter; this.tex.generateMipmaps=false; this.spec={scene:'hero'}; }
   update(t){
     const c=this.ctx, v=this.spec.proj && this.spec.proj.videoEl;
@@ -590,17 +618,13 @@ function build(){
         <div class="ptop">Clip ${pad(i+1)} / ${pad(P.length)} — ${esc(p.format)} — ${esc(p.runtime)}</div>
         <h2 class="ptitle">${esc(p.title)}</h2>
         <p class="pblurb">${esc(p.blurb)}</p>
-        <dl class="specs"><div><dt>Client</dt><dd>${esc(p.client)}</dd></div><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
+        <dl class="specs"><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
         <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:''}</div>
         <div class="linked" data-linked="${i}"></div>
       </div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
       {p:[r?-4.6:4.6, r?-1.2:1.2, 11.6], l:[r?.6:-.6,0,1]});
     updateLinked(i);
   });
-  add(`<div class="panel"><div class="shead"><h2>File index</h2><span>${P.length} clips · hover to preview</span></div>
-       <div class="row h"><span>№</span><span>Title</span><span>Client</span><span>Role</span><span>Year</span><span>Run</span></div>
-       ${P.map((p,i)=>`<div class="row" data-row="${i}"><span class="n">${pad(i+1)}</span><span class="t">${esc(p.title)}</span><span>${esc(p.client)}</span><span>${esc(p.role)}</span><span>${esc(p.year)}</span><span>${esc(p.runtime)}</span></div>`).join('')}
-       </div>`,'index',{scene:'field'},'Index',{p:[0,7.5,9.5],l:[0,-.5,0]});
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
        ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
@@ -653,8 +677,8 @@ onActive();
 function setTallClass(p){ const v=p.videoEl; document.body.classList.toggle('tall', !!(v && v.videoHeight>v.videoWidth)); }
 function moveVideoToTheater(p){ const w=$('#thVideoWrap'); w.innerHTML=''; if(p.videoEl){ w.appendChild(p.videoEl); setTallClass(p);} }
 function openTheater(i){
-  const p=P[i]; state.theater=p; document.body.classList.add('theater','locked');
-  $('#thTitle').textContent=p.title; $('#thTag').textContent=`● Now scanning — ${pad(i+1)} / ${p.client} / ${p.runtime}`;
+  const p=P[i]; state.theater=p; visit.plays++; document.body.classList.add('theater','locked');
+  $('#thTitle').textContent=p.title; $('#thTag').textContent=`● Now scanning — ${pad(i+1)} / ${p.runtime}`;
   moveVideoToTheater(p);
   const has=!!p.videoEl;
   document.querySelectorAll('#thView button').forEach(b=>{ if(b.dataset.v!=='scan') b.disabled=!has; });
@@ -707,6 +731,14 @@ addEventListener('pointermove',e=>{ mouse.nx=e.clientX/innerWidth*2-1; mouse.ny=
   if(holdStart && Math.hypot(e.clientX-holdStart.x,e.clientY-holdStart.y)>10){ clearTimeout(holdTimer); holdStart=null; if(state.hold){state.hold=0;} } },{passive:true});
 document.addEventListener('pointerleave',()=>mouse.in=false);
 let holdTimer=null, holdStart=null;
+const FINE=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const cur={el:$('#cur'), ring:$('#cur .ring'), dot:$('#cur .dot'), lbl:$('#cur .lbl'), x:-100,y:-100, rx:-100,ry:-100, n:0};
+if(FINE){
+  addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; cur.x=e.clientX; cur.y=e.clientY; document.body.classList.add('cur-on');
+    document.body.classList.toggle('cur-hot', !!e.target.closest('button,a,input,label,.row,.card,#thBar')); },{passive:true});
+  document.addEventListener('mouseleave',()=>document.body.classList.remove('cur-on'));
+  document.addEventListener('mouseenter',()=>document.body.classList.add('cur-on'));
+}
 const interactive=t=>t.closest('button,a,input,label,.row,.card,.panel');
 addEventListener('pointerdown',e=>{ if(!state.entered||interactive(e.target)) return; holdStart={x:e.clientX,y:e.clientY}; holdTimer=setTimeout(()=>{state.hold=1; sfx.tick();},e.pointerType==='touch'?260:170); });
 const endHold=e=>{ clearTimeout(holdTimer); holdStart=null; state.hold=0; if(e && e.pointerType==='touch') mouse.in=false; };
@@ -790,6 +822,18 @@ function frame(now){
   if(mouse.in && state.entered){ ray.setFromCamera({x:mouse.nx,y:mouse.ny},camera); if(ray.ray.intersectPlane(plane,hit)) U.uMouse.value.copy(hit); }
   U.uMouseOn.value+=((mouse.in&&state.entered&&state.view==='scan'?1:0)-U.uMouseOn.value)*.08;
 
+  if(FINE){
+    cur.rx+=(cur.x-cur.rx)*(1-Math.pow(.0005,dt)); cur.ry+=(cur.y-cur.ry)*(1-Math.pow(.0005,dt));
+    cur.dot.style.transform=`translate(${cur.x}px,${cur.y}px)`; cur.ring.style.transform=`translate(${cur.rx}px,${cur.ry}px)`; cur.lbl.style.transform=`translate(${cur.x}px,${cur.y}px)`;
+    document.body.classList.toggle('cur-hold', !!state.hold);
+    if(state.hold) cur.lbl.textContent='Raw feed';
+    else if(state.entered && mouse.in && (++cur.n%4===0)){
+      const u=hit.x/W+.5, v=hit.y/H+.5;
+      if(u<0||u>1||v<0||v>1||state.view!=='scan') cur.lbl.textContent='Z —';
+      else { try{ const d=S.a.ctx.getImageData(Math.min(SW-1,u*SW|0),Math.min(SH-1,(1-v)*SH|0),1,1).data, l=(d[0]*.299+d[1]*.587+d[2]*.114)/255;
+        cur.lbl.textContent= l<U.uCut.value ? 'Z — bg' : `Z ${(0.4+(1-l)*3.4).toFixed(2)} m`; }catch(e){ cur.lbl.textContent='Z —'; } }
+    } else if(!state.entered) cur.lbl.textContent='';
+  }
   U.uDepth.value+=((state.theater?4.4:3.2)-U.uDepth.value)*.05;
   const rv=Math.max(state.revealBase,state.hold); U.uReveal.value+=(rv-U.uReveal.value)*.12;
 
@@ -802,9 +846,29 @@ function frame(now){
 }
 requestAnimationFrame(frame);
 
+/* ---------- visit stats (aviram.app only; no-ops elsewhere) ---------- */
+const visit={id:null, seconds:0, plays:0, clips:{}};
+fetch('/api/visit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ref:document.referrer})})
+  .then(r=>r.ok&&(r.headers.get('content-type')||'').includes('json')?r.json():null).then(d=>{ if(d&&d.id) visit.id=d.id; }).catch(()=>{});
+function sendBeat(final){
+  if(!visit.id) return;
+  const body=JSON.stringify({id:visit.id,seconds:visit.seconds,entered:state.entered,plays:visit.plays,clips:visit.clips});
+  if(final && navigator.sendBeacon) navigator.sendBeacon('/api/visit/beat',new Blob([body],{type:'text/plain'}));
+  else fetch('/api/visit/beat',{method:'POST',body,keepalive:true}).catch(()=>{});
+}
+setInterval(()=>{
+  if(document.visibilityState!=='visible') return;
+  visit.seconds++;
+  const p=state.theater || (state.entered && sections[active] && sections[active].spec.proj);
+  if(p) visit.clips[p.title]=(visit.clips[p.title]||0)+1;
+  if(visit.seconds%15===0) sendBeat();
+},1000);
+addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') sendBeat(true); });
+addEventListener('pagehide',()=>sendBeat(true));
+
 /* ---------- boot ---------- */
 (async()=>{
-  const lines=['Sensor ............ <b>online</b>',`Points ............ <b>${N.toLocaleString()}</b>`,`Footage ........... <b>${P.length} clips</b>`,'Channel ........... <b>dark mode</b>','Depth range ....... <b>0.40–3.80 m</b>'];
+  const lines=[`Points ............ <b>${N.toLocaleString()}</b>`,`Footage ........... <b>${P.length} clips</b>`,'Depth range ....... <b>0.40–3.80 m</b>'];
   const bl=$('#blines'), bf=$('#bfill');
   const fontWait=(document.fonts&&document.fonts.load)?Promise.race([document.fonts.load('600 84px "Inter Tight"'),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
   for(let i=0;i<lines.length;i++){ await new Promise(r=>setTimeout(r,260)); bl.innerHTML+=lines[i]+'<br>'; bf.style.width=((i+1)/lines.length*100)+'%'; }
@@ -812,7 +876,7 @@ requestAnimationFrame(frame);
 })();
 $('#enter').onclick=()=>{
   state.entered=true; enterAt=performance.now(); sfx.init(); $('#boot').classList.add('gone'); document.body.classList.remove('locked');
-  scrollTo(0,0); U.uScatter.value=1.6;
+  scrollTo(0,0); U.uScatter.value=1.6; sendBeat();
 };
 } // main
 </script>

@@ -97,6 +97,15 @@ td.k{word-break:break-all}
 .pill{display:inline-block;padding:2px 6px;border:1px solid var(--line);font-size:10px;text-transform:uppercase}
 .pill.ok{border-color:var(--ok);color:var(--ok)}
 
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.tile{border:1px solid var(--line);background:var(--card);padding:14px}
+.tile b{display:block;font:500 30px/1 var(--disp);letter-spacing:-.04em;margin-bottom:6px}
+.tile span{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.chart{display:flex;align-items:flex-end;gap:2px;height:90px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.chart i{flex:1;background:var(--accent);min-height:1px;opacity:.85}
+.chart i:hover{opacity:1}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:24px}
+h3{font:500 20px var(--disp);letter-spacing:-.03em;margin-bottom:8px}
 .linkrow{display:grid;grid-template-columns:160px 1fr auto;gap:8px;margin-bottom:8px}
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:var(--fg);color:#000;padding:11px 15px;font-size:12px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90vw}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -110,6 +119,9 @@ td.k{word-break:break-all}
   .sum b{font-size:16px}
   .acts .hide-sm{display:none}
   .linkrow{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr 1fr}
+  .cols{grid-template-columns:1fr}
+  table{font-size:11px}
 }
 </style>
 </head>
@@ -138,6 +150,7 @@ td.k{word-break:break-all}
       <button data-tab="clips" class="on">Clips</button>
       <button data-tab="apps">Apps</button>
       <button data-tab="profile">Profile</button>
+      <button data-tab="stats">Stats</button>
       <button data-tab="library">Library</button>
     </nav>
   </header>
@@ -165,6 +178,23 @@ td.k{word-break:break-all}
       <h2>Profile</h2>
       <p class="lead">Your name, the intro lines, and the contact links on the last screen.</p>
       <div id="profile"></div>
+    </section>
+
+    <section data-panel="stats" hidden>
+      <h2>Stats</h2>
+      <p class="lead">How long people spend on aviram.app. Time counts only while the page is on screen; your own visits while logged in aren't counted.</p>
+      <div class="toolbar">
+        <select id="range" style="width:auto"><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="3650">All time</option></select>
+        <button class="btn" id="refreshStats">Refresh</button>
+      </div>
+      <div class="tiles" id="tiles"></div>
+      <div class="chart" id="chart"></div>
+      <div class="cols">
+        <div><h3>Clips</h3><table><thead><tr><th>Clip</th><th>Time watched</th><th>Visitors</th><th>Avg</th></tr></thead><tbody id="clipStats"></tbody></table></div>
+        <div><h3>Where from</h3><table><tbody id="refStats"></tbody></table><h3 style="margin-top:20px">Devices</h3><table><tbody id="devStats"></tbody></table></div>
+      </div>
+      <h3 style="margin-top:24px">Recent visits</h3>
+      <table><thead><tr><th>When</th><th>Time on site</th><th>Got in</th><th>Clips</th><th>Plays</th><th>Device</th><th>Country</th><th>From</th></tr></thead><tbody id="recent"></tbody></table>
     </section>
 
     <section data-panel="library" hidden>
@@ -270,6 +300,7 @@ $('#tabs').onclick = e => {
   $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
   $$('[data-panel]').forEach(p => (p.hidden = p.dataset.panel !== b.dataset.tab));
   if (b.dataset.tab === 'library') loadLibrary();
+  if (b.dataset.tab === 'stats') loadStats();
 };
 
 /* ---------------- render ---------------- */
@@ -282,7 +313,7 @@ const select = (label, key, val, opts) =>
 const area = (label, key, val) => `<label class="f"><span>${label}</span><textarea data-k="${key}" rows="2">${esc(val)}</textarea></label>`;
 
 function clipHTML(p, i) {
-  const meta = [p.client, p.year, p.runtime, p.format].filter(Boolean).join(' · ') || 'No details yet';
+  const meta = [p.year, p.role, p.runtime, p.format].filter(Boolean).join(' · ') || 'No details yet';
   return `<li class="item ${open.has(p) ? 'open' : ''}" data-i="${i}">
     <div class="head">
       <span class="handle" draggable="true" title="Drag to reorder">⠿</span>
@@ -295,7 +326,7 @@ function clipHTML(p, i) {
       </div>
     </div>
     ${open.has(p) ? `<div class="body">
-      <div class="grid g2">${field('Title', 'title', p.title)}${field('Client', 'client', p.client)}</div>
+      ${field('Title', 'title', p.title)}
       <div class="grid g4">${field('Year', 'year', p.year)}${field('Role', 'role', p.role)}${field('Runtime', 'runtime', p.runtime, 'text', 'placeholder="0:45"')}${select('Format', 'format', p.format, FORMATS)}</div>
       ${area('One-line description', 'blurb', p.blurb)}
       <div class="vid">
@@ -534,6 +565,31 @@ $('#lib').onclick = async e => {
     toast('Deleted.'); loadLibrary(); renderClips();
   } catch (err) { toast(err.message, true); }
 };
+
+/* ---------------- stats ---------------- */
+const dur = s => s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s` : `${Math.floor(s / 3600)}h ${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}m`;
+const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
+async function loadStats() {
+  $('#tiles').innerHTML = '<div style="color:var(--dim)">Loading…</div>';
+  try {
+    const d = await api('/api/stats?days=' + $('#range').value);
+    const pct = d.visits ? Math.round(d.entered / d.visits * 100) : 0;
+    $('#tiles').innerHTML = [
+      [d.visits, 'Visits'], [pct + '%', 'Got past intro'], [dur(d.medianSeconds), 'Median time'],
+      [dur(d.avgSeconds), 'Average time'], [dur(d.totalSeconds), 'Total time'], [d.plays, 'Plays'],
+    ].map(([v, l]) => `<div class="tile"><b>${esc(v)}</b><span>${l}</span></div>`).join('');
+    const days = Math.min(+d.days, 90), max = Math.max(1, ...Object.values(d.perDay));
+    const bars = [];
+    for (let k = days - 1; k >= 0; k--) { const day = new Date(Date.now() - k * 864e5).toISOString().slice(0, 10); const n = d.perDay[day] || 0; bars.push(`<i style="height:${n / max * 100}%" title="${day}: ${n} visit${n === 1 ? '' : 's'}"></i>`); }
+    $('#chart').innerHTML = bars.join(''); $('#chart').hidden = days < 2;
+    $('#clipStats').innerHTML = d.clips.map(c => `<tr><td>${esc(c.title)}</td><td>${dur(c.seconds)}</td><td>${c.visits}</td><td>${dur(Math.round(c.seconds / c.visits))}</td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--dim)">No clip views yet.</td></tr>';
+    const list = (o, el) => { $(el).innerHTML = Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `<tr><td>${esc(k === '—' || !k ? 'Direct / unknown' : k)}</td><td style="text-align:right">${v}</td></tr>`).join('') || '<tr><td style="color:var(--dim)">—</td></tr>'; };
+    list(d.referrers, '#refStats'); list(d.devices, '#devStats');
+    $('#recent').innerHTML = d.recent.map(r => `<tr><td>${ago(r.started)}</td><td>${dur(r.seconds)}</td><td>${r.entered ? '✓' : '—'}</td><td>${r.clips}</td><td>${r.plays}</td><td>${esc(r.device)}</td><td>${esc(r.country || '—')}</td><td>${esc(r.referrer || '—')}</td></tr>`).join('') || '<tr><td colspan="8" style="color:var(--dim)">No visits yet.</td></tr>';
+  } catch (err) { $('#tiles').innerHTML = `<div class="err-text">${esc(err.message)}</div>`; }
+}
+$('#range').onchange = loadStats;
+$('#refreshStats').onclick = loadStats;
 
 boot();
 </script>

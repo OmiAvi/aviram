@@ -15,6 +15,10 @@
   "r2_buckets": [
     { "binding": "MEDIA", "bucket_name": "aviram-media" }
   ],
+  // Visit stats (time on site, clips watched). Table is created on first use.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "aviram-db", "database_id": "b7d74d10-140b-4ebf-9397-a470bb5e013a" }
+  ],
   // aviram.app is a zone in this Cloudflare account; deploys attach it automatically.
   "routes": [
     { "pattern": "aviram.app", "custom_domain": true },

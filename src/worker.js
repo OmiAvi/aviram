@@ -3,7 +3,7 @@
 //   /media/*  videos stored in R2, served with HTTP Range support (needed by iPhone Safari)
 //   anything else → static files in ./public
 //
-// Bindings (wrangler.jsonc): MEDIA (R2 bucket), ASSETS (static files)
+// Bindings (wrangler.jsonc): MEDIA (R2 bucket), DB (D1, visit stats), ASSETS (static files)
 // Secrets: ADMIN_PASSWORD (required for /admin), SESSION_SECRET (optional, rotates logins)
 
 const SITE_KEY = 'content/site.json';
@@ -42,6 +42,8 @@ async function api(req, env, url) {
   if (route === 'GET /api/site') return json(await readSite(env, url.origin), 200, { 'cache-control': 'no-store' });
   if (route === 'GET /api/me') return json({ admin: await isAdmin(req, env), configured: !!env.ADMIN_PASSWORD });
   if (route === 'POST /api/login') return login(req, env);
+  if (route === 'POST /api/visit') return visitStart(req, env);
+  if (route === 'POST /api/visit/beat') return visitBeat(req, env);
   if (route === 'POST /api/logout') return json({ ok: true }, 200, { 'set-cookie': cookie('', 0) });
 
   // everything below needs an admin session + the CSRF header
@@ -49,6 +51,7 @@ async function api(req, env, url) {
   if (req.method !== 'GET' && req.headers.get('x-aviram') !== '1') throw new HttpError(403, 'Missing request header.');
 
   if (route === 'PUT /api/site') return saveSite(req, env);
+  if (route === 'GET /api/stats') return stats(env, url.searchParams);
   if (route === 'GET /api/media') return listMedia(env);
   if (route === 'DELETE /api/media') return deleteMedia(env, url.searchParams.get('key'));
   if (route === 'POST /api/uploads') return startUpload(req, env);
@@ -256,6 +259,87 @@ async function serveMedia(req, env, key) {
   }
   headers.set('content-length', String(size));
   return new Response(obj.body, { headers });
+}
+
+/* -------------------------------------------------------------- visits */
+// One row per page view. The page reports visible time every ~15s and when it closes.
+// No IP addresses are stored; country comes from Cloudflare.
+
+let tableReady = false;
+async function ensureTable(env) {
+  if (tableReady) return;
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS visits (
+    id TEXT PRIMARY KEY, started INTEGER NOT NULL, updated INTEGER NOT NULL,
+    seconds INTEGER NOT NULL DEFAULT 0, entered INTEGER NOT NULL DEFAULT 0, plays INTEGER NOT NULL DEFAULT 0,
+    clips TEXT, country TEXT, device TEXT, referrer TEXT)`).run();
+  await env.DB.prepare('CREATE INDEX IF NOT EXISTS visits_started ON visits(started)').run();
+  tableReady = true;
+}
+
+async function visitStart(req, env) {
+  if (!env.DB || (await isAdmin(req, env))) return json({ id: null }); // don't count yourself
+  const ua = req.headers.get('user-agent') || '';
+  if (/bot|crawler|spider|preview|facebookexternalhit|slurp|headless/i.test(ua)) return json({ id: null });
+  let body = {};
+  try { body = await req.json(); } catch {}
+  let ref = '';
+  try { const r = new URL(str(body.ref, 500)); if (r.host !== new URL(req.url).host) ref = r.host.replace(/^www\./, ''); } catch {}
+  const device = /iPad|Tablet/i.test(ua) ? 'tablet' : /Mobi|iPhone|Android/i.test(ua) ? 'phone' : 'desktop';
+  const id = crypto.randomUUID();
+  const now = Date.now();
+  await ensureTable(env);
+  await env.DB.prepare('INSERT INTO visits (id, started, updated, country, device, referrer) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(id, now, now, (req.cf && req.cf.country) || '', device, ref).run();
+  return json({ id });
+}
+
+async function visitBeat(req, env) {
+  if (!env.DB) return json({ ok: true });
+  let b;
+  try { b = JSON.parse(await req.text()); } catch { throw new HttpError(400, 'Bad beat.'); }
+  if (typeof b.id !== 'string' || !/^[0-9a-f-]{36}$/.test(b.id)) throw new HttpError(400, 'Bad id.');
+  const seconds = Math.max(0, Math.min(6 * 3600, Math.round(Number(b.seconds) || 0)));
+  const plays = Math.max(0, Math.min(500, Math.round(Number(b.plays) || 0)));
+  const clips = {};
+  if (b.clips && typeof b.clips === 'object')
+    for (const [k, v] of Object.entries(b.clips).slice(0, 80)) clips[str(k, 120)] = Math.max(0, Math.min(6 * 3600, Math.round(Number(v) || 0)));
+  await ensureTable(env);
+  // only grows, and only for visits started in the last 6 hours
+  await env.DB.prepare(`UPDATE visits SET updated = ?, seconds = MAX(seconds, ?), entered = MAX(entered, ?), plays = MAX(plays, ?), clips = ?
+    WHERE id = ? AND started > ?`)
+    .bind(Date.now(), seconds, b.entered ? 1 : 0, plays, JSON.stringify(clips), b.id, Date.now() - 6 * 3600e3).run();
+  return json({ ok: true });
+}
+
+async function stats(env, q) {
+  if (!env.DB) return json({ error: 'No database bound.' }, 500);
+  await ensureTable(env);
+  const days = Math.max(1, Math.min(3650, Number(q.get('days')) || 30));
+  const since = Date.now() - days * 864e5;
+  const { results } = await env.DB.prepare('SELECT * FROM visits WHERE started > ? ORDER BY started DESC LIMIT 20000').bind(since).all();
+  const rows = results || [];
+  const secs = rows.map((r) => r.seconds).sort((a, b) => a - b);
+  const clipTime = {}, clipViews = {};
+  for (const r of rows) {
+    let c = {};
+    try { c = JSON.parse(r.clips || '{}'); } catch {}
+    for (const [k, v] of Object.entries(c)) if (v > 0) { clipTime[k] = (clipTime[k] || 0) + v; clipViews[k] = (clipViews[k] || 0) + 1; }
+  }
+  const count = (key) => rows.reduce((m, r) => ((m[r[key] || '—'] = (m[r[key] || '—'] || 0) + 1), m), {});
+  const perDay = {};
+  for (const r of rows) { const d = new Date(r.started).toISOString().slice(0, 10); perDay[d] = (perDay[d] || 0) + 1; }
+  return json({
+    days,
+    visits: rows.length,
+    entered: rows.filter((r) => r.entered).length,
+    totalSeconds: secs.reduce((a, b) => a + b, 0),
+    avgSeconds: rows.length ? Math.round(secs.reduce((a, b) => a + b, 0) / rows.length) : 0,
+    medianSeconds: secs.length ? secs[Math.floor(secs.length / 2)] : 0,
+    plays: rows.reduce((a, r) => a + r.plays, 0),
+    clips: Object.keys(clipTime).map((k) => ({ title: k, seconds: clipTime[k], visits: clipViews[k] })).sort((a, b) => b.seconds - a.seconds),
+    devices: count('device'), countries: count('country'), referrers: count('referrer'), perDay,
+    recent: rows.slice(0, 100).map((r) => ({ started: r.started, seconds: r.seconds, entered: !!r.entered, plays: r.plays, country: r.country, device: r.device, referrer: r.referrer, clips: Object.keys(JSON.parse(r.clips || '{}')).length })),
+  });
 }
 
 /* ---------------------------------------------------------------- auth */
