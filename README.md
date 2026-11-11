@@ -1,9 +1,9 @@
-# Depth Reel
+# aviram.app — Depth Reel
 
 Omer Aviram's video portfolio. Every clip is depth-scanned live in the browser
 (WebGL point cloud, brightness = depth), then plays as real footage.
 
-Static site served by Cloudflare Workers (static assets). No build step.
+Static site served by Cloudflare Workers (static assets) at https://aviram.app. No build step.
 
 ```
 public/

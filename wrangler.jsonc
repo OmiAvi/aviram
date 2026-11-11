@@ -1,10 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "depth-reel",
+  "name": "aviram",
   "compatibility_date": "2026-11-01",
   // Static site: everything in ./public is served as-is. No Worker script needed.
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page"
-  }
+  },
+  // aviram.app must be a zone in this Cloudflare account (Websites → Add a domain)
+  // before deploys can attach it.
+  "routes": [
+    { "pattern": "aviram.app", "custom_domain": true },
+    { "pattern": "www.aviram.app", "custom_domain": true }
+  ]
 }

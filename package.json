@@ -1,5 +1,5 @@
 {
-  "name": "depth-reel",
+  "name": "aviram",
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
