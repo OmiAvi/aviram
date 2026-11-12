@@ -20,6 +20,7 @@ export default {
     try {
       if (path.startsWith('/api/')) return await api(req, env, url);
       if (path.startsWith('/media/')) return await serveMedia(req, env, decodeURIComponent(path.slice(1)));
+      if (path.startsWith('/videos/')) return await serveBundledVideo(req, env, url);
       return env.ASSETS.fetch(req);
     } catch (err) {
       if (err instanceof HttpError) return json({ error: err.message }, err.status);
@@ -207,6 +208,40 @@ async function listMedia(env) {
 async function deleteMedia(env, key) {
   await env.MEDIA.delete(mediaKey(key));
   return json({ ok: true });
+}
+
+/* ----------------------------------------------- bundled videos + Range */
+// Static-asset serving stalls on Range requests, which every <video> makes.
+// Fetch the whole file from ASSETS (no Range) and slice it here.
+async function serveBundledVideo(req, env, url) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
+  const res = await env.ASSETS.fetch(new Request(url.origin + url.pathname, { method: 'GET' }));
+  if (!res.ok) return res;
+  const headers = new Headers({
+    'content-type': res.headers.get('content-type') || 'video/mp4',
+    'accept-ranges': 'bytes',
+    'cache-control': 'public, max-age=86400',
+  });
+  const etag = res.headers.get('etag');
+  if (etag) headers.set('etag', etag);
+  const rh = req.headers.get('range');
+  const len = Number(res.headers.get('content-length'));
+  if (req.method === 'HEAD' && len) { res.body?.cancel(); headers.set('content-length', String(len)); return new Response(null, { headers }); }
+  const buf = await res.arrayBuffer();
+  const size = buf.byteLength;
+  if (req.method === 'HEAD') { headers.set('content-length', String(size)); return new Response(null, { headers }); }
+  const m = rh && /^bytes=(\d*)-(\d*)$/.exec(rh.trim());
+  if (m && (m[1] || m[2])) {
+    let start, end;
+    if (m[1] === '') { start = Math.max(0, size - Number(m[2])); end = size - 1; }
+    else { start = Number(m[1]); end = m[2] === '' ? size - 1 : Math.min(Number(m[2]), size - 1); }
+    if (start >= size || start > end) { headers.set('content-range', `bytes */${size}`); return new Response('Range not satisfiable', { status: 416, headers }); }
+    headers.set('content-range', `bytes ${start}-${end}/${size}`);
+    headers.set('content-length', String(end - start + 1));
+    return new Response(buf.slice(start, end + 1), { status: 206, headers });
+  }
+  headers.set('content-length', String(size));
+  return new Response(buf, { headers });
 }
 
 /* --------------------------------------------------------- media + Range */

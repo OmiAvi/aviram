@@ -9,7 +9,7 @@
     "directory": "./public",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*", "/media/*"]
+    "run_worker_first": ["/api/*", "/media/*", "/videos/*"]
   },
   // Videos + site content live here. Create once: npx wrangler r2 bucket create aviram-media
   "r2_buckets": [
