@@ -16,7 +16,7 @@
 }
 body.light{ --bg:#e7e4df; --fg:#140a04; --dim:rgba(20,10,4,.5); --line:rgba(20,10,4,.18); --panel:rgba(231,228,223,.62); }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-snap-type:y proximity;scroll-behavior:smooth}
+html{scroll-behavior:smooth}
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none;background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:12px;letter-spacing:.06em;overflow-x:hidden;transition:background .6s,color .6s;-webkit-font-smoothing:antialiased}
 body.locked{overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:inherit}
@@ -74,7 +74,44 @@ main{position:relative;z-index:10;transition:opacity .5s}
 .hero .live{position:absolute;top:96px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--dim);text-transform:uppercase;white-space:nowrap}
 .hero .live i{font-style:normal;color:var(--accentText)}
 
-.proj{align-items:flex-end}
+.proj{display:block;height:260vh;padding:0}
+.proj .stick{position:sticky;top:0;height:100vh;height:100svh;display:flex;align-items:flex-end;padding:110px 70px 128px 34px}
+.proj.r .stick{justify-content:flex-end;text-align:right}
+.tl{position:absolute;left:34px;right:70px;bottom:66px;display:flex;align-items:center;gap:12px;font-size:10px;text-transform:uppercase;color:var(--dim);pointer-events:none;text-shadow:0 0 8px var(--bg)}
+.tl .tc{color:var(--fg);font-variant-numeric:tabular-nums;min-width:76px}
+.tl .track{flex:1;height:14px;position:relative;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 12px);border-bottom:1px solid var(--line)}
+.tl .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent);opacity:.16}
+.tl .head{position:absolute;top:-7px;bottom:-5px;left:0;width:2px;margin-left:-1px;background:var(--accentText);box-shadow:0 0 10px var(--accent)}
+.tl .head::before{content:"";position:absolute;top:-5px;left:-4px;border:5px solid transparent;border-top-color:var(--accentText)}
+.tl .tlh{white-space:nowrap}
+#flash{position:fixed;inset:0;z-index:3;pointer-events:none;background:#fff;opacity:0}
+
+/* contact */
+.contact{align-items:center;justify-content:center}
+.contact .cwrap{width:min(1000px,100%);display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
+.contact h2{font-family:var(--disp);font-weight:500;font-size:clamp(44px,6vw,84px);line-height:.92;letter-spacing:-.05em;margin:10px 0 16px}
+.contact h2 i{color:var(--accentText)}
+.contact .chead p{color:var(--dim);line-height:1.7;max-width:380px;margin-bottom:18px;text-shadow:0 0 12px var(--bg),0 0 4px var(--bg)}
+.contact .chead{text-shadow:0 0 18px var(--bg)}
+.clinks{display:flex;gap:8px;flex-wrap:wrap}
+#cform{padding:22px;display:flex;flex-direction:column;gap:12px}
+#cform label{display:flex;flex-direction:column;gap:6px;font-size:10px;text-transform:uppercase;color:var(--dim)}
+#cform input,#cform textarea{font:14px/1.5 var(--disp);letter-spacing:-.01em;color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 0;outline:none;resize:vertical;border-radius:0;transition:border-color .2s}
+#cform input:focus,#cform textarea:focus{border-color:var(--accentText)}
+#cform .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#cform .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#cform .send{display:flex;align-items:center;gap:14px;margin-top:6px}
+#cform .cstat{font-size:10px;text-transform:uppercase;color:var(--dim)}
+#cform.sent{align-items:flex-start;justify-content:center;min-height:300px}
+#cform.sent h3{font:500 40px/1 var(--disp);letter-spacing:-.04em;margin-bottom:10px}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+
+/* 3D portrait */
+.namerow{display:flex;align-items:flex-end;gap:10px}
+.me{position:relative;width:210px;height:280px;flex:none;margin:0 0 -6px -10px;cursor:grab;touch-action:none}
+.me:active{cursor:grabbing}
+.me canvas{width:100%;height:100%;display:block}
+.me span{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--dim);white-space:nowrap;opacity:.8;pointer-events:none}
 .proj.r{justify-content:flex-end;text-align:right}
 .pbox{max-width:520px;text-shadow:0 0 24px var(--bg),0 0 8px var(--bg)}
 .pnum{font-family:var(--disp);font-weight:400;letter-spacing:-.06em;font-size:clamp(90px,14vw,200px);line-height:.8;color:transparent;-webkit-text-stroke:1px var(--accentText);opacity:.9;margin-bottom:6px;text-shadow:none}
@@ -190,6 +227,12 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
   .card{min-height:150px}
   .hint{display:none}
   .hero .live{top:70px}
+  .proj .stick{padding:100px 22px 140px}
+  .tl{left:22px;right:22px;bottom:84px;gap:8px}
+  .tl .tlh{display:none}
+  .contact .cwrap{grid-template-columns:1fr;gap:20px}
+  #cform .row2{grid-template-columns:1fr}
+  .me{width:120px;height:160px;margin:0 0 -4px -6px}
   .brand b{font-size:16px;white-space:nowrap}
   .ctrls{gap:4px;flex-wrap:nowrap}
   .chip{padding:7px 8px}
@@ -238,6 +281,7 @@ body.cur-hold #cur .ring::before{border-style:solid;animation-duration:1s}
 <body class="locked">
 
 <canvas id="gl"></canvas>
+<div id="flash"></div>
 <div class="fx"><div class="scan"></div><div class="grain"></div><div class="vig"></div></div>
 
 <div id="boot">
@@ -245,7 +289,7 @@ body.cur-hold #cur .ring::before{border-style:solid;animation-duration:1s}
     <h1>Depth<br><i>Reel</i></h1>
     <div class="sub">Omer Aviram — video portfolio</div>
     <p class="what">A <b>depth scan</b> turns video into thousands of dots floating in 3D. The brighter a pixel, the closer its dot sits to you, so every frame of these edits becomes something you can move through.</p>
-    <ul class="how"><li><b>Scroll</b> to scan each clip</li><li><b>Move</b> your cursor or finger to push the dots</li><li><b>Hold</b> anywhere to see the real colors</li><li><b>Play footage</b> to watch the actual video</li></ul>
+    <ul class="how"><li><b>Scroll</b> to scrub through each clip like a timeline</li><li><b>Move</b> your cursor or finger to push the dots</li><li><b>Hold</b> anywhere to see the real colors</li><li><b>Play footage</b> to watch the actual video</li></ul>
     <div class="blines" id="blines"></div>
     <div class="bbar"><i id="bfill"></i></div>
     <button id="enter">▶ Enter the scan</button>
@@ -332,6 +376,8 @@ const CONFIG = {
 
 /* Live content: on aviram.app the admin's saved content (/api/site) replaces the
    defaults above. Anywhere else (or if the request fails) the defaults are used. */
+let DEPTH={};
+async function loadDepth(){ try{ const r=await fetch('/depth/manifest.json',{cache:'no-store'}); if(r.ok && (r.headers.get('content-type')||'').includes('json')) DEPTH=await r.json(); }catch(e){} }
 async function loadSite(){
   try{
     const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),3500);
@@ -339,11 +385,11 @@ async function loadSite(){
     if(r.ok && (r.headers.get('content-type')||'').includes('json')){ const d=await r.json(); if(d && Array.isArray(d.projects)) Object.assign(CONFIG,d); }
   }catch(e){}
 }
-loadSite().then(main);
+Promise.all([loadSite(),loadDepth()]).then(main);
 function main(){
 
 /* ===================================================================== */
-const $ = s => document.querySelector(s);
+const $ = (s,el=document) => el.querySelector(s);
 const esc = v => String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const hash = n => { const s = Math.sin(n)*43758.5453; return s - Math.floor(s); };
@@ -362,7 +408,16 @@ const PARTS=Array.from({length:46},()=>({x:Math.random()*SW,y:Math.random()*SH,s
 const gray = v => { v=Math.round(clamp(v,0,255)); return `rgb(${v},${v},${v})`; };
 let FIELD_IMG=null;
 
+const leader={on:false,t0:0,step:.85,timers:[]};
 const G = {
+  leader(c,t){   // Academy-leader countdown, drawn as depth
+    const e=(performance.now()-leader.t0)/1000, n=Math.max(1,3-Math.floor(e/leader.step)), f=(e%leader.step)/leader.step, cx=128, cy=72;
+    c.fillStyle='#2e2e2e'; c.fillRect(0,0,SW,SH);
+    c.fillStyle='#5c5c5c'; c.beginPath(); c.moveTo(cx,cy); c.arc(cx,cy,200,-Math.PI/2,-Math.PI/2+f*Math.PI*2); c.closePath(); c.fill();
+    c.fillStyle='#000'; c.fillRect(0,cy-1,SW,2); c.fillRect(cx-1,0,2,SH);
+    c.strokeStyle='#cfcfcf'; c.lineWidth=3; c.beginPath(); c.arc(cx,cy,54,0,7); c.stroke(); c.lineWidth=2; c.beginPath(); c.arc(cx,cy,64,0,7); c.stroke();
+    c.save(); c.filter='blur(1px)'; c.fillStyle='#fff'; c.font='600 82px "PP Neue Montreal","Inter Tight",Arial,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(String(n),cx,cy+5); c.restore();
+  },
   hero(c,t){
     c.save(); c.filter='blur(1.6px)';
     c.font='600 84px "PP Neue Montreal", "Inter Tight", "Helvetica Neue", Arial, sans-serif';
@@ -467,17 +522,21 @@ function sparkle(c,t,amt){
 
 /* ---------- a depth source: procedural scene or a video ---------- */
 class Source{
-  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:true});
+  // canvas is two frames side by side: [depth | color]
+  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW*2; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:true});
     this.tex=new THREE.CanvasTexture(this.cv); this.tex.minFilter=THREE.LinearFilter; this.tex.magFilter=THREE.LinearFilter; this.tex.generateMipmaps=false; this.spec={scene:'hero'}; }
   update(t){
-    const c=this.ctx, v=this.spec.proj && this.spec.proj.videoEl;
-    c.save(); c.globalCompositeOperation='source-over'; c.filter='none'; c.fillStyle='#000'; c.fillRect(0,0,SW,SH);
-    if(v && v.readyState>=2 && !v._tainted){
-      const vw=v.videoWidth, vh=v.videoHeight, s=Math.max(SW/vw,SH/vh), w=vw*s, h=vh*s;
-      c.filter='contrast(1.25) brightness(1.05)'; c.drawImage(v,(SW-w)/2,(SH-h)/2,w,h);
-      if(!v._checked){ v._checked=true; try{ c.getImageData(0,0,1,1); }catch(e){ v._tainted=true; console.warn('Video host lacks CORS; using procedural scene.'); } }
-    } else (G[this.spec.scene]||G.hero)(c,t);
-    c.restore(); if(!(v && v._tainted===true && false)) this.tex.needsUpdate=true;
+    const c=this.ctx, p=this.spec.proj, v=p&&p.videoEl, dv=p&&p.depthEl;
+    c.save(); c.globalCompositeOperation='source-over'; c.filter='none'; c.fillStyle='#000'; c.fillRect(0,0,SW*2,SH);
+    const ok=v && v.readyState>=2 && !v._tainted, dok=dv && dv.readyState>=2;
+    const cover=(el,x,f)=>{ const vw=el.videoWidth, vh=el.videoHeight; if(!vw) return; const s=Math.max(SW/vw,SH/vh), w=vw*s, h=vh*s;
+      c.save(); c.beginPath(); c.rect(x,0,SW,SH); c.clip(); c.filter=f||'none'; c.drawImage(el,x+(SW-w)/2,(SH-h)/2,w,h); c.restore(); };
+    if(ok||dok){
+      if(ok) cover(v,SW);
+      if(dok) cover(dv,0,'contrast(1.08)'); else cover(v,0,'contrast(1.25) brightness(1.05)');
+      if(ok && !v._checked){ v._checked=true; try{ c.getImageData(SW,0,1,1); }catch(e){ v._tainted=true; } }
+    } else { (G[this.spec.scene]||G.hero)(c,t); c.drawImage(this.cv,0,0,SW,SH,SW,0,SW,SH); }
+    c.restore(); this.tex.needsUpdate=true;
   }
 }
 
@@ -514,13 +573,14 @@ const PAL={
 const U={
   uA:{value:null}, uB:{value:null}, uMix:{value:0}, uTime:{value:0}, uDepth:{value:3.2}, uScatter:{value:1.6}, uSweep:{value:0},
   uSize:{value:3}, uCut:{value:.08}, uMouse:{value:new THREE.Vector3(99,99,0)}, uMouseOn:{value:0}, uReveal:{value:0}, uBgA:{value:.16}, uGain:{value:1.05},
+  uGlitch:{value:0}, uSeed:{value:0}, uWhip:{value:0}, uWhipV:{value:0}, uFlash:{value:0},
   uC0:{value:new THREE.Color()}, uC1:{value:new THREE.Color()}, uC2:{value:new THREE.Color()}, uC3:{value:new THREE.Color()}, uC4:{value:new THREE.Color()}, uBg:{value:new THREE.Color()},
 };
 const mat=new THREE.ShaderMaterial({
   uniforms:U, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending,
   vertexShader:`
     attribute vec2 aUv; attribute vec3 aRnd;
-    uniform sampler2D uA,uB; uniform float uMix,uTime,uDepth,uScatter,uSweep,uSize,uCut,uMouseOn;
+    uniform sampler2D uA,uB; uniform float uMix,uTime,uDepth,uScatter,uSweep,uSize,uCut,uMouseOn,uGlitch,uSeed,uWhip,uWhipV,uFlash;
     uniform vec3 uMouse;
     varying float vD,vFg,vBand; varying vec3 vRgb;
     float h(float n){return fract(sin(n)*43758.5453);}
@@ -530,15 +590,19 @@ const mat=new THREE.ShaderMaterial({
       float fr=floor(uTime*9.);
       float gl=step(.993,h(row*1.7+fr));
       float off=gl*(h(row+fr*3.1)-.5)*.07;
-      vec2 suv=vec2(uv.x+off,uv.y);
-      vec4 ta=texture2D(uA,suv), tb=texture2D(uB,suv);
-      float la=dot(ta.rgb,vec3(.299,.587,.114)), lb=dot(tb.rgb,vec3(.299,.587,.114));
-      float d=mix(la,lb,uMix);
-      vRgb=mix(ta.rgb,tb.rgb,uMix);
+      off+=uGlitch*(h(row*5.3+fr)-.5)*.4*step(.5,h(row*7.1+fr*1.3));
+      float x=clamp(uv.x+off,.002,.998);
+      vec2 duv=vec2(x*.5,uv.y), cuv=vec2(.5+x*.5,uv.y);
+      float la=dot(texture2D(uA,duv).rgb,vec3(.299,.587,.114)), lb=dot(texture2D(uB,duv).rgb,vec3(.299,.587,.114));
+      float m=uGlitch>0. ? step(h(row*1.37+uSeed),uMix) : uMix;
+      float d=mix(la,lb,m);
+      vRgb=mix(texture2D(uA,cuv).rgb,texture2D(uB,cuv).rgb,m);
       float fg=smoothstep(uCut,uCut+.06,d);
       vec3 p=position;
       p.z=d*uDepth*fg;
       p+=(aRnd-.5)*vec3(7.,5.,10.)*uScatter*(.35+fg);
+      p.x+=uWhip+(aRnd.y-.5)*uWhipV;
+      p.z+=uFlash*2.2*fg;
       p.z+=sin(uTime*2.+aRnd.x*40.)*.03*fg;
       vec2 df=p.xy-uMouse.xy; float f=exp(-dot(df,df)/1.4)*uMouseOn;
       p.z+=f*1.3*(.3+fg); p.xy+=normalize(df+1e-4)*f*.38;
@@ -550,7 +614,7 @@ const mat=new THREE.ShaderMaterial({
       gl_PointSize=uSize*(.5+d*.95*fg+vBand*.4)*(14./-mv.z);
     }`,
   fragmentShader:`
-    uniform vec3 uC0,uC1,uC2,uC3,uC4,uBg; uniform float uReveal,uBgA,uGain;
+    uniform vec3 uC0,uC1,uC2,uC3,uC4,uBg; uniform float uReveal,uBgA,uGain,uFlash;
     varying float vD,vFg,vBand; varying vec3 vRgb;
     vec3 ramp(float x){ x=clamp(x,0.,1.);
       if(x<.25) return mix(uC0,uC1,x/.25); if(x<.5) return mix(uC1,uC2,(x-.25)/.25);
@@ -560,6 +624,7 @@ const mat=new THREE.ShaderMaterial({
       float soft=smoothstep(.5,.15,r);
       vec3 col=mix(uBg, ramp(vD*uGain+vBand*.22), vFg);
       col=mix(col, vRgb, uReveal*vFg);
+      col+=uFlash*.55*vFg;
       float a=mix(uBgA,1.,vFg)*soft;
       gl_FragColor=vec4(col,a);
     }`
@@ -588,15 +653,28 @@ function applyLook(){
 applyLook();
 
 /* ---------- sources + transitions ---------- */
-const S={a:new Source(), b:new Source(), tween:false, t0:0, curKey:'hero|', nextKey:''};
+const S={a:new Source(), b:new Source(), tween:false, t0:0, curKey:'hero|', nextKey:'', type:'scatter', dir:-1, seed:0};
 const keyOf=s=>s.scene+'|'+(s.proj&&s.proj.videoEl?s.proj.videoEl.src:'');
-function transitionTo(spec, silent){
+// cut styles: whip pan, glitch slices, flash frame, dissolve-scatter
+const TRANS={scatter:1150, whip:760, glitch:620, flash:700};
+function transitionTo(spec, silent, type='scatter', dir=-1){
   const k=keyOf(spec), target=S.tween?S.nextKey:S.curKey;
   if(k===target) return;
   if(S.tween){ const tmp=S.a; S.a=S.b; S.b=tmp; S.curKey=S.nextKey; }
-  S.b.spec=spec; S.nextKey=k; S.tween=true; S.t0=performance.now();
+  S.b.spec=spec; S.nextKey=k; S.tween=true; S.t0=performance.now(); S.type=TRANS[type]?type:'scatter'; S.dir=dir; S.seed=Math.random()*100;
   if(!silent) sfx.whoosh(); manageVideos();
 }
+function tweenStep(now){
+  U.uWhip.value=0; U.uWhipV.value=0; U.uGlitch.value=0; U.uFlash.value=0;
+  const k=clamp((now-S.t0)/TRANS[S.type],0,1);
+  if(S.type==='scatter'){ U.uMix.value=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; U.uScatter.value=Math.max(U.uScatter.value*.9,Math.sin(Math.PI*k)*.42); }
+  else if(S.type==='whip'){ const a=k<.5?Math.pow(k*2,2.2):-Math.pow(1-(k-.5)*2,2.2); U.uMix.value=k<.5?0:1; U.uWhip.value=S.dir*a*W*1.15; U.uWhipV.value=(1-Math.abs(.5-k)*2)*7; }
+  else if(S.type==='glitch'){ U.uMix.value=k; U.uGlitch.value=Math.sin(Math.PI*k); U.uSeed.value=S.seed; }
+  else if(S.type==='flash'){ U.uMix.value=k<.3?0:1; U.uFlash.value=Math.exp(-Math.pow((k-.3)/.11,2)); }
+  flashEl.style.opacity=(U.uFlash.value*(state.light?.25:.18)).toFixed(3);
+  if(k>=1){ const tmp=S.a; S.a=S.b; S.b=tmp; S.curKey=S.nextKey; S.tween=false; U.uMix.value=0; U.uWhip.value=U.uWhipV.value=U.uGlitch.value=U.uFlash.value=0; flashEl.style.opacity=0; manageVideos(); }
+}
+const flashEl=$('#flash');
 
 /* ---------- sections ---------- */
 const P=CONFIG.projects;
@@ -609,11 +687,11 @@ function build(){
   const [first,...rest]=CONFIG.name.split(' ');
   const tc=w=>w.charAt(0)+w.slice(1).toLowerCase();
   add(`<div class="live">● Live depth · <i>${N.toLocaleString()}</i> points · ${COLS}×${ROWS}</div>
-       <div class="who"><h1>${esc(tc(first))}<br><em>${esc(rest.map(tc).join(' '))}</em></h1><p>${esc(CONFIG.role)}<br>${esc(CONFIG.base)}</p></div>
+       <div class="who"><div class="namerow"><h1>${esc(tc(first))}<br><em>${esc(rest.map(tc).join(' '))}</em></h1><div class="me" id="me" hidden><canvas></canvas><span>⟲ drag</span></div></div><p>${esc(CONFIG.role)}<br>${esc(CONFIG.base)}</p></div>
        <div class="cue">Scroll to scan ↓</div>`,'hero',{scene:'hero'},'Intro',{p:[0,0,14],l:[0,0,0]});
   P.forEach((p,i)=>{
     const r=i%2===1;
-    const s=add(`<div class="pbox">
+    const s=add(`<div class="stick"><div class="pbox">
         <div class="pnum">${pad(i+1)}</div>
         <div class="ptop">Clip ${pad(i+1)} / ${pad(P.length)} — ${esc(p.format)} — ${esc(p.runtime)}</div>
         <h2 class="ptitle">${esc(p.title)}</h2>
@@ -621,13 +699,24 @@ function build(){
         <dl class="specs"><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
         <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:''}</div>
         <div class="linked" data-linked="${i}"></div>
-      </div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
+      </div>
+      <div class="tl"><span class="tc">00:00:00</span><div class="track"><i class="fill"></i><b class="head"></b></div><span class="dur">${esc(p.runtime)}</span><span class="tlh">↕ Scroll to scrub</span></div></div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
       {p:[r?-4.6:4.6, r?-1.2:1.2, 11.6], l:[r?.6:-.6,0,1]});
     updateLinked(i);
   });
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
        ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
+  const clinks=[...(CONFIG.links||[]).filter(l=>l.url).map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)];
+  if(CONFIG.email) clinks.unshift(`<a class="btn" href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`);
+  add(`<div class="cwrap"><div class="chead"><div class="ptop">Contact</div><h2>Let's make something <i>move.</i></h2>
+       <p>Hype edits, launch videos, or an app with the video built in. Tell me what you're working on and I'll get back to you.</p><div class="clinks">${clinks.join('')}</div></div>
+       <form id="cform" class="panel" novalidate>
+         <div class="row2"><label>Name<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="200" autocomplete="email"></label></div>
+         <label>What are you working on?<textarea name="message" rows="5" required maxlength="4000"></textarea></label>
+         <input name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+         <div class="send"><button class="btn primary" type="submit">Send ▶</button><span class="cstat"></span></div>
+       </form></div>`,'contact',{scene:'pulse'},'Contact',{p:[4.5,1.4,12],l:[0,0,0]});
   const links=[...(CONFIG.links||[]).filter(l=>l.url).map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)];
   if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`);
   add(`<h2>End of <b>tape.</b></h2><p>${esc(CONFIG.about)}</p>
@@ -646,12 +735,39 @@ function attachVideo(p,url,isBlob){
   v.setAttribute('playsinline',''); if(!isBlob && /^https?:/.test(url) && !url.startsWith(location.origin)) v.crossOrigin='anonymous'; v.src=url;
   v.addEventListener('loadedmetadata',()=>{ if(state.theater===p) setTallClass(p); });
   $('#videoBin').appendChild(v); p.videoEl=v; p._blob=isBlob;
+  if(p.depthEl){ p.depthEl.remove(); p.depthEl=null; }
+  const dm=DEPTH[url];
+  if(dm && dm.src){ const d=document.createElement('video'); d.muted=true; d.loop=true; d.playsInline=true; d.setAttribute('playsinline',''); d.preload='auto'; d.src=dm.src; $('#videoBin').appendChild(d); p.depthEl=d; }
 }
 function updateLinked(i){ const el=document.querySelector(`[data-linked="${i}"]`); if(el) el.textContent=''; }
+// Outside the player, clips don't play: scrolling scrubs them like a timeline playhead.
 function manageVideos(){
-  P.forEach(p=>{ const v=p.videoEl; if(!v) return;
-    const on=S.a.spec.proj===p || (S.tween&&S.b.spec.proj===p) || state.theater===p;
-    if(on && v.paused) v.play().catch(()=>{}); else if(!on && !v.paused) v.pause(); });
+  P.forEach((p,i)=>{ const th=state.theater===p;
+    [p.videoEl,p.depthEl].forEach(el=>{ if(!el) return; if(th){ if(el.paused) el.play().catch(()=>{}); } else if(!el.paused) el.pause(); });
+    // warm up the clip you're on and the next one
+    const near=sections[active] && (sections[active].spec.proj===p || (sections[active+1]&&sections[active+1].spec.proj===p));
+    if(near && p.videoEl && p.videoEl.preload!=='auto') p.videoEl.preload='auto';
+  });
+}
+let lastScroll=0;
+addEventListener('scroll',()=>{ lastScroll=performance.now(); },{passive:true});
+const fmtTC=t=>{ const f=Math.floor((t%1)*30); return `${pad(Math.floor(t/60))}:${pad(Math.floor(t)%60)}:${pad(f)}`; };
+function seekTo(el,t,thr){ if(!el||el.seeking||el.readyState<1) return; if(Math.abs(el.currentTime-t)>thr){ try{ el.currentTime=t; }catch(e){} } }
+function syncVideos(now){
+  if(state.theater){
+    const v=state.theater.videoEl, d=state.theater.depthEl;
+    if(v&&d){ if(Math.abs(d.currentTime-v.currentTime)>.15 && !d.seeking) d.currentTime=v.currentTime;
+      if(v.paused!==d.paused){ v.paused?d.pause():d.play().catch(()=>{}); } }
+    return;
+  }
+  const s=sections[active], p=s&&s.spec.proj; if(!p) return;
+  const r=s.el.getBoundingClientRect(), span=r.height-innerHeight, prog=span>0?clamp(-r.top/span,0,1):0;
+  const v=p.videoEl, d=p.depthEl, dur=(v&&v.duration)||(d&&d.duration)||0;
+  const t=dur?dur*(.03+prog*.94):0;
+  if(d) seekTo(d,t,1/20);
+  if(!d || now-lastScroll>140) seekTo(v,t,d?.25:1/20);   // color only needs to catch up when you pause
+  const tl=s.tl||(s.tl={head:$('.tl .head',s.el),fill:$('.tl .fill',s.el),tc:$('.tl .tc',s.el)});
+  if(tl.head){ tl.head.style.left=(prog*100)+'%'; tl.fill.style.width=(prog*100)+'%'; tl.tc.textContent=fmtTC(t); }
 }
 
 /* ---------- navigation ---------- */
@@ -662,9 +778,11 @@ function detect(){
   sections.forEach((s,i)=>{const r=s.el.getBoundingClientRect(); if(r.top<=mid && r.bottom>mid) best=i;});
   if(best!==active){ active=best; onActive(); }
 }
+const CUTS=['whip','glitch','flash','whip','glitch','scatter']; let prevActive=0;
 function onActive(){
   const s=sections[active];
-  if(!state.theater) transitionTo(s.spec);
+  if(!state.theater && !leader.on) transitionTo(s.spec,false,CUTS[active%CUTS.length],active>prevActive?-1:1);
+  prevActive=active;
   $('#secIdx').textContent=pad(active+1); $('#secName').textContent=s.name;
   document.querySelectorAll('#rail button').forEach((b,i)=>b.classList.toggle('on',i===active));
   zRange();
@@ -685,8 +803,8 @@ function openTheater(i){
   $('#thHint').textContent='';
   $('#thBar').style.display=has?'':'none'; $('#thMute').style.display=has?'':'none';
   setView('scan');
-  if(has){ const v=p.videoEl; v.currentTime=0; v.muted=!state.snd; v.play().catch(()=>{}); updMute(); }
-  transitionTo({scene:p.scene,proj:p}); sfx.duck(has&&state.snd); sfx.whoosh();
+  if(has){ const v=p.videoEl; v.currentTime=0; if(p.depthEl) p.depthEl.currentTime=0; v.muted=!state.snd; v.play().catch(()=>{}); updMute(); }
+  transitionTo({scene:p.scene,proj:p},false,'flash'); manageVideos(); sfx.duck(has&&state.snd); sfx.whoosh();
 }
 function closeTheater(){
   const p=state.theater; if(!p) return;
@@ -721,7 +839,9 @@ const sfx=(()=>{
     g.gain.setValueAtTime(.012,t); g.gain.exponentialRampToValueAtTime(.0001,t+.05); o.connect(g); g.connect(master); o.start(t); o.stop(t+.06); }
   function set(on){ if(master) master.gain.setTargetAtTime(on?.6:0,AC.currentTime,.1); }
   function duck(on){ if(drone) drone.gain.setTargetAtTime(on?.012:.06,AC.currentTime,.3); }
-  return {init,whoosh,tick,set,duck};
+  function beep(f=1000,len=.09,vol=.05){ if(!AC||!state.snd) return; const t=AC.currentTime, o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.005); g.gain.setValueAtTime(vol,t+len-.01); g.gain.linearRampToValueAtTime(0,t+len); o.connect(g); g.connect(master); o.start(t); o.stop(t+len+.02); }
+  return {init,whoosh,tick,set,duck,beep};
 })();
 
 /* ---------- input ---------- */
@@ -739,14 +859,14 @@ if(FINE){
   document.addEventListener('mouseleave',()=>document.body.classList.remove('cur-on'));
   document.addEventListener('mouseenter',()=>document.body.classList.add('cur-on'));
 }
-const interactive=t=>t.closest('button,a,input,label,.row,.card,.panel');
+const interactive=t=>t.closest('button,a,input,textarea,label,.row,.card,.panel,.me');
 addEventListener('pointerdown',e=>{ if(!state.entered||interactive(e.target)) return; holdStart={x:e.clientX,y:e.clientY}; holdTimer=setTimeout(()=>{state.hold=1; sfx.tick();},e.pointerType==='touch'?260:170); });
 const endHold=e=>{ clearTimeout(holdTimer); holdStart=null; state.hold=0; if(e && e.pointerType==='touch') mouse.in=false; };
 addEventListener('pointerup',endHold);
 addEventListener('pointercancel',endHold);
 // no long-press menus, text selection, or image/video save sheets
-addEventListener('contextmenu',e=>{ if(!e.target.closest('a')) e.preventDefault(); });
-addEventListener('selectstart',e=>e.preventDefault());
+addEventListener('contextmenu',e=>{ if(!e.target.closest('a,input,textarea')) e.preventDefault(); });
+addEventListener('selectstart',e=>{ if(!e.target.closest||!e.target.closest('input,textarea')) e.preventDefault(); });
 addEventListener('dragstart',e=>e.preventDefault());
 
 document.addEventListener('click',e=>{
@@ -760,13 +880,13 @@ document.addEventListener('click',e=>{
 document.addEventListener('pointerover',e=>{
   const r=e.target.closest('[data-row],[data-app]'); if(!r||state.theater) return;
   if(r._hov) return; r._hov=true; sfx.tick();
-  if(r.dataset.row!==undefined){ const p=P[+r.dataset.row]; transitionTo({scene:p.scene,proj:p},true); }
-  else { transitionTo({scene:CONFIG.apps[+r.dataset.app].scene},true); }
+  if(r.dataset.row!==undefined){ const p=P[+r.dataset.row]; transitionTo({scene:p.scene,proj:p},true,'glitch'); }
+  else { transitionTo({scene:CONFIG.apps[+r.dataset.app].scene},true,'glitch'); }
 });
 document.addEventListener('pointerout',e=>{
   const r=e.target.closest('[data-row],[data-app]'); if(!r) return;
   if(e.relatedTarget && r.contains(e.relatedTarget)) return; r._hov=false;
-  const host=r.closest('.sec'); if(!state.theater && host && !host.contains(e.relatedTarget&&e.relatedTarget.closest?e.relatedTarget.closest('[data-row],[data-app]'):null)) transitionTo(sections[active].spec,true);
+  const host=r.closest('.sec'); if(!state.theater && host && !host.contains(e.relatedTarget&&e.relatedTarget.closest?e.relatedTarget.closest('[data-row],[data-app]'):null)) transitionTo(sections[active].spec,true,'glitch');
 });
 
 $('#bMode').onclick=()=>{ state.light=!state.light; applyLook(); sfx.tick(); };
@@ -778,7 +898,7 @@ $('#thReveal').oninput=e=>state.revealBase=+e.target.value;
 $('#thMute').onclick=()=>{ const v=state.theater&&state.theater.videoEl; if(!v) return; v.muted=!v.muted; sfx.duck(!v.muted); updMute(); };
 $('#thBar').onclick=e=>{ const v=state.theater&&state.theater.videoEl; if(!v||!v.duration) return; const r=e.currentTarget.getBoundingClientRect(); v.currentTime=(e.clientX-r.left)/r.width*v.duration; };
 addEventListener('keydown',e=>{
-  if(!state.entered) return;
+  if(!state.entered || (e.target.closest && e.target.closest('input,textarea'))) return;
   if(e.key==='Escape') closeTheater();
   else if(state.theater) return;
   else if(['ArrowDown','PageDown','j'].includes(e.key)){ e.preventDefault(); goTo(active+1); }
@@ -803,10 +923,9 @@ function frame(now){
   U.uTime.value=t; U.uSweep.value=((t*.22)%1.5)-.25;
 
   // sources
+  syncVideos(now);
   S.a.update(t); if(S.tween) S.b.update(t);
-  if(S.tween){ const k=clamp((now-S.t0)/1150,0,1), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; U.uMix.value=e;
-    const sc=Math.sin(Math.PI*k)*.42; U.uScatter.value=Math.max(U.uScatter.value*.9,sc);
-    if(k>=1){ const tmp=S.a; S.a=S.b; S.b=tmp; S.curKey=S.nextKey; S.tween=false; U.uMix.value=0; manageVideos(); } }
+  if(S.tween) tweenStep(now);
   else if(state.entered) U.uScatter.value+= (0-U.uScatter.value)*(1-Math.pow(.02,dt));
   U.uA.value=S.a.tex; U.uB.value=S.b.tex;
 
@@ -814,6 +933,7 @@ function frame(now){
   const cam = state.theater ? {p:[0,0,10.5],l:[0,0,1]} : sections[active].cam;
   tmpV.set(cam.p[0]+mouse.nx*1.3, cam.p[1]+mouse.ny*.9, cam.p[2]); tmpV.multiplyScalar(camFactor);
   if(!state.entered) tmpV.set(Math.sin(t*.2)*3,1.5,22*camFactor);
+  else if(leader.on) tmpV.set(mouse.nx*.6,mouse.ny*.4,13*camFactor);
   tmpL.set(cam.l[0],cam.l[1],cam.l[2]);
   const ease=1-Math.pow(.18,dt);
   camPos.lerp(tmpV,ease); camLook.lerp(tmpL,ease); camera.position.copy(camPos); camera.lookAt(camLook);
@@ -838,10 +958,11 @@ function frame(now){
   const rv=Math.max(state.revealBase,state.hold); U.uReveal.value+=(rv-U.uReveal.value)*.12;
 
   // HUD
-  if(state.entered){ const s=(now-enterAt)/1000, f=Math.floor((s%1)*24); $('#tc').textContent=`${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(Math.floor(s)%60)}:${pad(f)}`; }
+  if(state.entered && !leader.on){ const s=(now-enterAt)/1000, f=Math.floor((s%1)*24); $('#tc').textContent=`${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(Math.floor(s)%60)}:${pad(f)}`; }
   const v=state.theater&&state.theater.videoEl; if(v&&v.duration) $('#thBar i').style.width=(v.currentTime/v.duration*100)+'%';
 
   renderer.render(scene,camera);
+  if(meView && active===0 && !state.theater) meView.render(dt,t);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -866,6 +987,78 @@ setInterval(()=>{
 addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') sendBeat(true); });
 addEventListener('pagehide',()=>sendBeat(true));
 
+/* ---------- contact ---------- */
+const cform=$('#cform'), loadedAt=Date.now();
+if(cform) cform.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=new FormData(cform), stat=$('.cstat',cform), btn=$('button',cform);
+  const data={name:(f.get('name')||'').trim(), email:(f.get('email')||'').trim(), message:(f.get('message')||'').trim(), company:f.get('company')||'', t:Date.now()-loadedAt};
+  if(!data.name||!data.message||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)){ stat.textContent='Add your name, a valid email and a message.'; return; }
+  btn.disabled=true; stat.textContent='Sending…';
+  try{
+    const r=await fetch('/api/contact',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});
+    if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error||'Could not send');
+    cform.classList.add('sent'); cform.innerHTML=`<h3>Got it, ${esc(data.name.split(' ')[0])}.</h3><p style="color:var(--dim);line-height:1.7">Your message is in. I'll reply to ${esc(data.email)} soon.</p>`;
+    sfx.beep(1200,.08,.04); transitionTo({scene:'pulse'},true,'flash');
+  }catch(err){ btn.disabled=false; stat.textContent=CONFIG.email?`Couldn't send — email ${CONFIG.email} instead.`:`Couldn't send right now — try again in a minute.`; }
+});
+
+/* ---------- 3D portrait (drag to rotate) ---------- */
+// Three depth scans of the head (left, front, right). Each turns with real
+// parallax over its own range; dragging past it crossfades to the next scan.
+function initMe(){
+  const box=$('#me'); if(!box) return null;
+  const cv=$('canvas',box);
+  const VIEWS=[{n:'left',yaw:-1.2},{n:'front',yaw:0},{n:'right',yaw:1.2}];
+  const r=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false}); r.setPixelRatio(DPR); r.setClearColor(0,0);
+  const sc=new THREE.Scene(), cam=new THREE.PerspectiveCamera(28,3/4,.1,50); cam.position.set(0,.55,6.4);
+  const st={yaw:0, pitch:0, vy:0, drag:null, hover:0, ready:false, views:[]};
+  const loadImg=src=>new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
+  const pix=img=>{ const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; const x=c.getContext('2d'); x.drawImage(img,0,0); return x.getImageData(0,0,c.width,c.height).data; };
+  const mk=()=>new THREE.ShaderMaterial({
+    uniforms:{uC0:U.uC0,uC1:U.uC1,uC2:U.uC2,uC3:U.uC3,uC4:U.uC4,uReveal:{value:0},uW:{value:0},uSize:{value:2},uTime:U.uTime},
+    transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending,
+    vertexShader:`attribute float aD; attribute float aR; attribute vec3 aCol; uniform float uW,uSize,uTime; varying float vD; varying vec3 vCol;
+      void main(){ vec3 p=position; vec3 j=vec3(aR,fract(aR*7.31),fract(aR*13.7))-.5; p+=j*(1.-uW)*(1.-uW)*.7; p.z+=sin(uTime*1.7+aR*30.)*.012;
+        vD=aD; vCol=aCol; vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(.6+aD*.6)*(7./-mv.z); }`,
+    fragmentShader:`uniform vec3 uC0,uC1,uC2,uC3,uC4; uniform float uReveal,uW; varying float vD; varying vec3 vCol;
+      vec3 ramp(float x){ x=clamp(x,0.,1.); if(x<.25) return mix(uC0,uC1,x/.25); if(x<.5) return mix(uC1,uC2,(x-.25)/.25); if(x<.75) return mix(uC2,uC3,(x-.5)/.25); return mix(uC3,uC4,(x-.75)/.25); }
+      void main(){ vec2 q=gl_PointCoord-.5; float rr=length(q); if(rr>.5) discard; vec3 c=mix(ramp(.08+vD*.72),vCol,uReveal); gl_FragColor=vec4(c,uW*(.62+.38*uReveal)*smoothstep(.5,.12,rr)); }`
+  });
+  Promise.all(VIEWS.map(v=>Promise.all([loadImg(`/me/me-${v.n}.jpg`),loadImg(`/me/me-${v.n}-depth.png`)]))).then(imgs=>{
+    imgs.forEach(([ci,di],k)=>{
+      const W=di.width, H=di.height, cd=pix(ci), dd=pix(di), step=IS_MOBILE?5:4, P=[],D=[],C=[],R=[];
+      for(let y=0;y<H;y+=step) for(let x=0;x<W;x+=step){ const i=(y*W+x)*4, d=dd[i]/255; if(d<.04) continue;
+        P.push((x/W-.5)*3, (.5-y/H)*4, (d-.55)*1.5); D.push(d); C.push(cd[i]/255,cd[i+1]/255,cd[i+2]/255); R.push(Math.random()); }
+      const g=new THREE.BufferGeometry();
+      g.setAttribute('position',new THREE.Float32BufferAttribute(P,3)); g.setAttribute('aD',new THREE.Float32BufferAttribute(D,1));
+      g.setAttribute('aCol',new THREE.Float32BufferAttribute(C,3)); g.setAttribute('aR',new THREE.Float32BufferAttribute(R,1));
+      const pts=new THREE.Points(g,mk()); pts.frustumCulled=false; sc.add(pts); st.views.push({...VIEWS[k],pts});
+    });
+    st.ready=true; box.hidden=false; size();
+  }).catch(()=>{});   // no portrait files → nothing shows
+  function size(){ const w=box.clientWidth, h=box.clientHeight; if(!w) return; r.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); }
+  addEventListener('resize',size);
+  box.addEventListener('pointerdown',e=>{ st.drag={x:e.clientX,y:e.clientY,yaw:st.yaw,pitch:st.pitch,t:performance.now()}; box.setPointerCapture(e.pointerId); sfx.tick(); });
+  box.addEventListener('pointermove',e=>{ if(!st.drag) return; const nyaw=clamp(st.drag.yaw+(e.clientX-st.drag.x)*.012,-1.6,1.6);
+    st.vy=(nyaw-st.yaw); st.yaw=nyaw; st.pitch=clamp(st.drag.pitch+(e.clientY-st.drag.y)*.006,-.35,.35); });
+  const up=()=>{ st.drag=null; }; box.addEventListener('pointerup',up); box.addEventListener('pointercancel',up);
+  box.addEventListener('pointerenter',()=>st.hover=1); box.addEventListener('pointerleave',()=>st.hover=0);
+  return { render(dt,t){
+    if(!st.ready) return;
+    if(cv.width!==Math.round(box.clientWidth*DPR) || cv.height!==Math.round(box.clientHeight*DPR)) size();
+    if(!st.drag){ st.yaw+=st.vy; st.vy*=.9;                       // fling, then drift back to a gentle sway
+      const home=Math.sin(t*.45)*.32; st.yaw+=(home-st.yaw)*(1-Math.pow(.35,dt)); st.pitch+=(Math.sin(t*.3)*.05-st.pitch)*(1-Math.pow(.2,dt)); }
+    const rev=Math.max(st.hover*.85,state.hold);
+    st.views.forEach(v=>{ const off=st.yaw-v.yaw, w=clamp(1.25-Math.abs(off)/.8,0,1);
+      v.pts.visible=w>.01; v.pts.rotation.set(st.pitch,clamp(off,-.7,.7),0);
+      const u=v.pts.material.uniforms; u.uW.value=w*w*(3-2*w); u.uSize.value=(IS_MOBILE?2.2:2.4)*DPR; u.uReveal.value+=(rev-u.uReveal.value)*.12;
+      const bl=state.light?THREE.NormalBlending:THREE.AdditiveBlending; if(v.pts.material.blending!==bl){ v.pts.material.blending=bl; v.pts.material.needsUpdate=true; } });
+    r.render(sc,cam);
+  } };
+}
+const meView=initMe();
+
 /* ---------- boot ---------- */
 (async()=>{
   const lines=[`Points ............ <b>${N.toLocaleString()}</b>`,`Footage ........... <b>${P.length} clips</b>`,'Depth range ....... <b>0.40–3.80 m</b>'];
@@ -874,9 +1067,20 @@ addEventListener('pagehide',()=>sendBeat(true));
   for(let i=0;i<lines.length;i++){ await new Promise(r=>setTimeout(r,260)); bl.innerHTML+=lines[i]+'<br>'; bf.style.width=((i+1)/lines.length*100)+'%'; }
   await fontWait; $('#enter').classList.add('ready');
 })();
+function endLeader(){
+  if(!leader.on) return; leader.on=false; leader.timers.forEach(clearTimeout);
+  enterAt=performance.now(); sfx.beep(1000,.12,.06);
+  transitionTo(sections[active].spec,true,'flash');
+}
 $('#enter').onclick=()=>{
   state.entered=true; enterAt=performance.now(); sfx.init(); $('#boot').classList.add('gone'); document.body.classList.remove('locked');
-  scrollTo(0,0); U.uScatter.value=1.6; sendBeat();
+  scrollTo(0,0); U.uScatter.value=.9; sendBeat();
+  // 3-2-1 film leader in dots, then cut to the reel
+  leader.on=true; leader.t0=performance.now();
+  S.a.spec={scene:'leader'}; S.curKey='leader|'; S.tween=false;
+  [0,1,2].forEach(i=>leader.timers.push(setTimeout(()=>sfx.beep(i===2?1200:900,.07,.04), i*leader.step*1000+30)));
+  leader.timers.push(setTimeout(endLeader, 3*leader.step*1000));
+  setTimeout(()=>addEventListener('pointerdown',endLeader,{once:true}),200);   // tap to skip
 };
 } // main
 </script>

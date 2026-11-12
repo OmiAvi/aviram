@@ -97,6 +97,14 @@ td.k{word-break:break-all}
 .pill{display:inline-block;padding:2px 6px;border:1px solid var(--line);font-size:10px;text-transform:uppercase}
 .pill.ok{border-color:var(--ok);color:var(--ok)}
 
+.badge{display:inline-block;min-width:16px;padding:1px 5px;margin-left:4px;background:var(--accent);color:#000;font-size:9px;font-weight:600;border-radius:8px;text-align:center}
+.msg{border:1px solid var(--line);background:var(--card);padding:16px;margin-bottom:8px}
+.msg.unread{border-color:rgba(255,90,0,.6)}
+.msg .mh{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.msg .mh b{font:500 20px var(--disp);letter-spacing:-.02em}
+.msg .mh span{color:var(--dim);font-size:11px}
+.msg p{white-space:pre-wrap;line-height:1.6;margin-bottom:12px;font-family:var(--disp);font-size:15px}
+.msg .ma{display:flex;gap:6px;flex-wrap:wrap}
 .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
 .tile{border:1px solid var(--line);background:var(--card);padding:14px}
 .tile b{display:block;font:500 30px/1 var(--disp);letter-spacing:-.04em;margin-bottom:6px}
@@ -150,6 +158,7 @@ h3{font:500 20px var(--disp);letter-spacing:-.03em;margin-bottom:8px}
       <button data-tab="clips" class="on">Clips</button>
       <button data-tab="apps">Apps</button>
       <button data-tab="profile">Profile</button>
+      <button data-tab="inbox">Inbox <b id="unread" class="badge" hidden></b></button>
       <button data-tab="stats">Stats</button>
       <button data-tab="library">Library</button>
     </nav>
@@ -178,6 +187,12 @@ h3{font:500 20px var(--disp);letter-spacing:-.03em;margin-bottom:8px}
       <h2>Profile</h2>
       <p class="lead">Your name, the intro lines, and the contact links on the last screen.</p>
       <div id="profile"></div>
+    </section>
+
+    <section data-panel="inbox" hidden>
+      <h2>Inbox</h2>
+      <p class="lead">Messages from the contact form on aviram.app.</p>
+      <div id="msgs"></div>
     </section>
 
     <section data-panel="stats" hidden>
@@ -266,7 +281,7 @@ async function start() {
   site.projects ||= []; site.apps ||= []; site.links ||= [];
   savedJSON = JSON.stringify(site);
   $('#login').hidden = true; $('#app').hidden = false;
-  renderAll(); markDirty();
+  renderAll(); markDirty(); loadInbox(true);
 }
 
 /* ---------------- save ---------------- */
@@ -301,6 +316,7 @@ $('#tabs').onclick = e => {
   $$('[data-panel]').forEach(p => (p.hidden = p.dataset.panel !== b.dataset.tab));
   if (b.dataset.tab === 'library') loadLibrary();
   if (b.dataset.tab === 'stats') loadStats();
+  if (b.dataset.tab === 'inbox') loadInbox();
 };
 
 /* ---------------- render ---------------- */
@@ -590,6 +606,28 @@ async function loadStats() {
 }
 $('#range').onchange = loadStats;
 $('#refreshStats').onclick = loadStats;
+
+/* ---------------- inbox ---------------- */
+async function loadInbox(countOnly) {
+  try {
+    const d = await api('/api/messages');
+    $('#unread').hidden = !d.unread; $('#unread').textContent = d.unread;
+    if (countOnly) return;
+    $('#msgs').innerHTML = d.items.map(m => `<div class="msg ${m.read ? '' : 'unread'}" data-id="${esc(m.id)}">
+      <div class="mh"><b>${esc(m.name)}</b><span>${esc(m.email)} · ${ago(m.created)}${m.country ? ' · ' + esc(m.country) : ''}</span></div>
+      <p>${esc(m.message)}</p>
+      <div class="ma"><a class="btn sm primary" href="mailto:${esc(m.email)}?subject=${encodeURIComponent('Re: your message on aviram.app')}">Reply</a>
+        <button class="btn sm" data-mread="${m.read ? 0 : 1}">${m.read ? 'Mark unread' : 'Mark read'}</button>
+        <button class="btn sm danger" data-mdel>Delete</button></div></div>`).join('') || '<p style="color:var(--dim)">No messages yet.</p>';
+  } catch (err) { if (!countOnly) $('#msgs').innerHTML = `<p class="err-text">${esc(err.message)}</p>`; }
+}
+$('#msgs').onclick = async e => {
+  const el = e.target.closest('.msg'); if (!el) return;
+  const id = el.dataset.id;
+  if (e.target.closest('[data-mread]')) { await api('/api/messages/read', { method: 'POST', json: { id, read: e.target.closest('[data-mread]').dataset.mread === '1' } }); loadInbox(); }
+  else if (e.target.closest('[data-mdel]')) { if (!confirm('Delete this message?')) return; await api('/api/messages?id=' + encodeURIComponent(id), { method: 'DELETE' }); loadInbox(); }
+  else if (e.target.closest('a[href^="mailto"]') && el.classList.contains('unread')) { api('/api/messages/read', { method: 'POST', json: { id, read: true } }).then(() => loadInbox()); }
+};
 
 boot();
 </script>

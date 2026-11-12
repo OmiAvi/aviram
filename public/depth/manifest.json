@@ -1,0 +1,51 @@
+{
+  "/media/holy-war.mp4": {
+    "src": "/depth/holy-war-5711eb49.mp4",
+    "w": 308,
+    "h": 224,
+    "fps": 15,
+    "frames": 921
+  },
+  "/media/mwcv8u0o-week-3.mp4": {
+    "src": "/depth/mwcv8u0o-week-3-16a55616.mp4",
+    "w": 308,
+    "h": 168,
+    "fps": 15,
+    "frames": 1234
+  },
+  "/media/week-2.mp4": {
+    "src": "/depth/week-2-96557b72.mp4",
+    "w": 308,
+    "h": 168,
+    "fps": 15,
+    "frames": 783
+  },
+  "/media/mwcurq40-week-4-hype-vid.mp4": {
+    "src": "/depth/mwcurq40-week-4-hype-vid-bc88f071.mp4",
+    "w": 168,
+    "h": 308,
+    "fps": 15,
+    "frames": 741
+  },
+  "/media/week-5.mp4": {
+    "src": "/depth/week-5-c7ee81fc.mp4",
+    "w": 308,
+    "h": 224,
+    "fps": 15,
+    "frames": 926
+  },
+  "/media/georgia-auburn.mp4": {
+    "src": "/depth/georgia-auburn-a12d4230.mp4",
+    "w": 308,
+    "h": 224,
+    "fps": 15,
+    "frames": 863
+  },
+  "/media/week-1.mp4": {
+    "src": "/depth/week-1-1fc2e8ce.mp4",
+    "w": 308,
+    "h": 168,
+    "fps": 15,
+    "frames": 1006
+  }
+}
