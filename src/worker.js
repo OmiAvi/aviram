@@ -20,7 +20,7 @@ export default {
     try {
       if (path.startsWith('/api/')) return await api(req, env, url);
       if (path.startsWith('/media/')) return await serveMedia(req, env, decodeURIComponent(path.slice(1)));
-      if (path.startsWith('/videos/') || (path.startsWith('/depth/') && path.endsWith('.mp4'))) return await serveBundledVideo(req, env, url);
+      if (path.startsWith('/videos/')) return await serveBundledVideo(req, env, url);
       return env.ASSETS.fetch(req);
     } catch (err) {
       if (err instanceof HttpError) return json({ error: err.message }, err.status);
@@ -45,7 +45,6 @@ async function api(req, env, url) {
   if (route === 'POST /api/login') return login(req, env);
   if (route === 'POST /api/visit') return visitStart(req, env);
   if (route === 'POST /api/visit/beat') return visitBeat(req, env);
-  if (route === 'POST /api/contact') return contact(req, env);
   if (route === 'POST /api/logout') return json({ ok: true }, 200, { 'set-cookie': cookie('', 0) });
 
   // everything below needs an admin session + the CSRF header
@@ -54,9 +53,6 @@ async function api(req, env, url) {
 
   if (route === 'PUT /api/site') return saveSite(req, env);
   if (route === 'GET /api/stats') return stats(env, url.searchParams);
-  if (route === 'GET /api/messages') return listMessages(env);
-  if (route === 'POST /api/messages/read') return markMessage(req, env);
-  if (route === 'DELETE /api/messages') return deleteMessage(env, url.searchParams.get('id'));
   if (route === 'GET /api/media') return listMedia(env);
   if (route === 'DELETE /api/media') return deleteMedia(env, url.searchParams.get('key'));
   if (route === 'POST /api/uploads') return startUpload(req, env);
@@ -379,52 +375,6 @@ async function stats(env, q) {
     devices: count('device'), countries: count('country'), referrers: count('referrer'), perDay,
     recent: rows.slice(0, 100).map((r) => ({ started: r.started, seconds: r.seconds, entered: !!r.entered, plays: r.plays, country: r.country, device: r.device, referrer: r.referrer, clips: Object.keys(JSON.parse(r.clips || '{}')).length })),
   });
-}
-
-/* ------------------------------------------------------------- contact */
-let msgTableReady = false;
-async function ensureMessages(env) {
-  if (msgTableReady) return;
-  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS messages (
-    id TEXT PRIMARY KEY, created INTEGER NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
-    message TEXT NOT NULL, read INTEGER NOT NULL DEFAULT 0, country TEXT)`).run();
-  msgTableReady = true;
-}
-
-async function contact(req, env) {
-  if (!env.DB) throw new HttpError(503, 'Messages are not set up.');
-  let b;
-  try { b = await req.json(); } catch { throw new HttpError(400, 'Bad request.'); }
-  // bots: hidden field filled in, or submitted faster than a person can type → pretend it worked
-  if (b.company || Number(b.t) < 3000) return json({ ok: true });
-  const name = str(b.name, 100), email = str(b.email, 200), message = str(b.message, 4000);
-  if (!name || !message || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new HttpError(400, 'Add your name, a valid email and a message.');
-  if ((message.match(/https?:\/\//g) || []).length > 3) return json({ ok: true });
-  await ensureMessages(env);
-  const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE created > ?').bind(Date.now() - 10 * 60e3).first();
-  if (recent && recent.n > 20) throw new HttpError(429, 'Too many messages right now — try again in a few minutes.');
-  await env.DB.prepare('INSERT INTO messages (id, created, name, email, message, country) VALUES (?, ?, ?, ?, ?, ?)')
-    .bind(crypto.randomUUID(), Date.now(), name, email, message, (req.cf && req.cf.country) || '').run();
-  return json({ ok: true });
-}
-
-async function listMessages(env) {
-  await ensureMessages(env);
-  const { results } = await env.DB.prepare('SELECT * FROM messages ORDER BY created DESC LIMIT 500').all();
-  return json({ items: results || [], unread: (results || []).filter((m) => !m.read).length });
-}
-
-async function markMessage(req, env) {
-  const { id, read } = await req.json();
-  await ensureMessages(env);
-  await env.DB.prepare('UPDATE messages SET read = ? WHERE id = ?').bind(read ? 1 : 0, str(id, 60)).run();
-  return json({ ok: true });
-}
-
-async function deleteMessage(env, id) {
-  await ensureMessages(env);
-  await env.DB.prepare('DELETE FROM messages WHERE id = ?').bind(str(id, 60)).run();
-  return json({ ok: true });
 }
 
 /* ---------------------------------------------------------------- auth */

@@ -10,8 +10,6 @@ public/index.html          the reel (built-in content is only a fallback)
 public/admin/index.html    /admin — edit clips, apps, profile; upload videos
 public/site.default.json   starting content, used until the first save in /admin
 public/videos/*.mp4        clips bundled with the first version (moved to R2 from /admin)
-public/depth/              real depth maps per clip (Depth Anything V2) + manifest.json
-scripts/depth.py           builds depth maps for new clips
 src/worker.js              API: login, content, uploads to R2, video streaming with Range
 wrangler.jsonc             Cloudflare config (R2 bucket, D1 stats db, aviram.app routes)
 ```
@@ -25,7 +23,6 @@ Go to **https://aviram.app/admin** and log in.
   right away; other edits wait for **Save** (or Cmd+S).
 - **Apps** — the "Also builds" cards.
 - **Profile** — name, intro lines, about text, email and links.
-- **Inbox** — messages from the contact form (unread count on the tab).
 - **Stats** — visits, how long people stay (only while the page is on screen),
   how many get past the intro, time spent per clip, plays, devices, referrers.
   Your own visits while logged in aren't counted; no IP addresses are stored.
@@ -36,30 +33,6 @@ can be restored from the Cloudflare dashboard (copy it over `content/site.json`)
 
 For the web, export clips at 720p–1080p and ideally under ~40 MB: viewers stream
 the whole file.
-
-## Real 3D (depth maps)
-
-The dots get their depth from a small grayscale video per clip, made by an AI depth
-model (Depth Anything V2) and kept frame-locked with the clip. Clips without one fall
-back to brightness-as-depth until it's built.
-
-After uploading a new clip in /admin, build its depth map:
-
-```bash
-pip install -r scripts/requirements.txt
-python scripts/depth.py          # reads the live site, writes public/depth/
-git add public/depth && git commit -m "Depth maps" && git push
-```
-
-Or have GitHub do it automatically every 6 hours: add
-`scripts/depth-workflow.yml` to the repo as `.github/workflows/depth.yml`
-(on github.com: Add file → Create new file, paste it in).
-
-## Sharing
-
-- Link previews (LinkedIn, iMessage, X…) use `public/og.jpg` plus the meta tags in `index.html`.
-- Every clip has its own link, e.g. `aviram.app/#the-holy-war` (title in lowercase, dashes
-  for spaces). The address bar follows as you scroll, and each clip has a **Share** button.
 
 ## How it's wired
 
