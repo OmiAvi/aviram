@@ -3,7 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OMER AVIRAM — Depth Reel</title>
+<title>Omer Aviram — Depth Reel</title>
+<meta name="description" content="Omer Aviram, video editor and developer. Hype edits for Snapback Saturdays, depth-scanned into 3D. Scroll to scrub through the reel.">
+<meta name="theme-color" content="#050302">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://aviram.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Omer Aviram">
+<meta property="og:url" content="https://aviram.app/">
+<meta property="og:title" content="Omer Aviram — Depth Reel">
+<meta property="og:description" content="Video editor + developer. Every edit depth-scanned into 3D — scroll to scrub through the reel.">
+<meta property="og:image" content="https://aviram.app/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The name Omer rendered as a glowing orange 3D point cloud, with a dot-scan of Omer's head beside it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Omer Aviram — Depth Reel">
+<meta name="twitter:description" content="Video editor + developer. Every edit depth-scanned into 3D.">
+<meta name="twitter:image" content="https://aviram.app/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -106,12 +125,6 @@ main{position:relative;z-index:10;transition:opacity .5s}
 #cform.sent h3{font:500 40px/1 var(--disp);letter-spacing:-.04em;margin-bottom:10px}
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 
-/* 3D portrait */
-.namerow{display:flex;align-items:flex-end;gap:10px}
-.me{position:relative;width:210px;height:280px;flex:none;margin:0 0 -6px -10px;cursor:grab;touch-action:none}
-.me:active{cursor:grabbing}
-.me canvas{width:100%;height:100%;display:block}
-.me span{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--dim);white-space:nowrap;opacity:.8;pointer-events:none}
 .proj.r{justify-content:flex-end;text-align:right}
 .pbox{max-width:520px;text-shadow:0 0 24px var(--bg),0 0 8px var(--bg)}
 .pnum{font-family:var(--disp);font-weight:400;letter-spacing:-.06em;font-size:clamp(90px,14vw,200px);line-height:.8;color:transparent;-webkit-text-stroke:1px var(--accentText);opacity:.9;margin-bottom:6px;text-shadow:none}
@@ -232,7 +245,6 @@ body.v-footage .th-top .tag{text-shadow:0 0 8px #000}
   .tl .tlh{display:none}
   .contact .cwrap{grid-template-columns:1fr;gap:20px}
   #cform .row2{grid-template-columns:1fr}
-  .me{width:120px;height:160px;margin:0 0 -4px -6px}
   .brand b{font-size:16px;white-space:nowrap}
   .ctrls{gap:4px;flex-wrap:nowrap}
   .chip{padding:7px 8px}
@@ -408,16 +420,9 @@ const PARTS=Array.from({length:46},()=>({x:Math.random()*SW,y:Math.random()*SH,s
 const gray = v => { v=Math.round(clamp(v,0,255)); return `rgb(${v},${v},${v})`; };
 let FIELD_IMG=null;
 
-const leader={on:false,t0:0,step:.85,timers:[]};
+const leader={on:false};
 const G = {
-  leader(c,t){   // Academy-leader countdown, drawn as depth
-    const e=(performance.now()-leader.t0)/1000, n=Math.max(1,3-Math.floor(e/leader.step)), f=(e%leader.step)/leader.step, cx=128, cy=72;
-    c.fillStyle='#2e2e2e'; c.fillRect(0,0,SW,SH);
-    c.fillStyle='#5c5c5c'; c.beginPath(); c.moveTo(cx,cy); c.arc(cx,cy,200,-Math.PI/2,-Math.PI/2+f*Math.PI*2); c.closePath(); c.fill();
-    c.fillStyle='#000'; c.fillRect(0,cy-1,SW,2); c.fillRect(cx-1,0,2,SH);
-    c.strokeStyle='#cfcfcf'; c.lineWidth=3; c.beginPath(); c.arc(cx,cy,54,0,7); c.stroke(); c.lineWidth=2; c.beginPath(); c.arc(cx,cy,64,0,7); c.stroke();
-    c.save(); c.filter='blur(1px)'; c.fillStyle='#fff'; c.font='600 82px "PP Neue Montreal","Inter Tight",Arial,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(String(n),cx,cy+5); c.restore();
-  },
+
   hero(c,t){
     c.save(); c.filter='blur(1.6px)';
     c.font='600 84px "PP Neue Montreal", "Inter Tight", "Helvetica Neue", Arial, sans-serif';
@@ -687,7 +692,7 @@ function build(){
   const [first,...rest]=CONFIG.name.split(' ');
   const tc=w=>w.charAt(0)+w.slice(1).toLowerCase();
   add(`<div class="live">● Live depth · <i>${N.toLocaleString()}</i> points · ${COLS}×${ROWS}</div>
-       <div class="who"><div class="namerow"><h1>${esc(tc(first))}<br><em>${esc(rest.map(tc).join(' '))}</em></h1><div class="me" id="me" hidden><canvas></canvas><span>⟲ drag</span></div></div><p>${esc(CONFIG.role)}<br>${esc(CONFIG.base)}</p></div>
+       <div class="who"><div class="namerow"><h1>${esc(tc(first))}<br><em>${esc(rest.map(tc).join(' '))}</em></h1></div><p>${esc(CONFIG.role)}<br>${esc(CONFIG.base)}</p></div>
        <div class="cue">Scroll to scan ↓</div>`,'hero',{scene:'hero'},'Intro',{p:[0,0,14],l:[0,0,0]});
   P.forEach((p,i)=>{
     const r=i%2===1;
@@ -697,7 +702,7 @@ function build(){
         <h2 class="ptitle">${esc(p.title)}</h2>
         <p class="pblurb">${esc(p.blurb)}</p>
         <dl class="specs"><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
-        <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:''}</div>
+        <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:''}<button class="btn" data-share="${i}" title="Share this clip">⤴ Share</button></div>
         <div class="linked" data-linked="${i}"></div>
       </div>
       <div class="tl"><span class="tc">00:00:00</span><div class="track"><i class="fill"></i><b class="head"></b></div><span class="dur">${esc(p.runtime)}</span><span class="tlh">↕ Scroll to scrub</span></div></div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
@@ -778,11 +783,20 @@ function detect(){
   sections.forEach((s,i)=>{const r=s.el.getBoundingClientRect(); if(r.top<=mid && r.bottom>mid) best=i;});
   if(best!==active){ active=best; onActive(); }
 }
+const slugOf=t=>String(t||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+const sectionSlug=s=>s.spec.proj?slugOf(s.spec.proj.title):(s.name==='Contact'?'contact':'');
+function syncHash(){ if(!state.entered||leader.on) return; const sl=sectionSlug(sections[active]); const want=sl?'#'+sl:'';
+  if(location.hash!==want){ try{ history.replaceState(null,'',location.pathname+want); }catch(e){} } }
+async function shareClip(i){
+  const p=P[i], url=`${location.origin}/#${slugOf(p.title)}`;
+  try{ if(navigator.share && matchMedia('(pointer:coarse)').matches){ await navigator.share({title:`${p.title} — Omer Aviram`,url}); return; } }catch(e){ if(e.name==='AbortError') return; }
+  try{ await navigator.clipboard.writeText(url); toast('Link copied'); }catch(e){ toast(url); }
+}
 const CUTS=['whip','glitch','flash','whip','glitch','scatter']; let prevActive=0;
 function onActive(){
   const s=sections[active];
   if(!state.theater && !leader.on) transitionTo(s.spec,false,CUTS[active%CUTS.length],active>prevActive?-1:1);
-  prevActive=active;
+  prevActive=active; syncHash();
   $('#secIdx').textContent=pad(active+1); $('#secName').textContent=s.name;
   document.querySelectorAll('#rail button').forEach((b,i)=>b.classList.toggle('on',i===active));
   zRange();
@@ -859,7 +873,7 @@ if(FINE){
   document.addEventListener('mouseleave',()=>document.body.classList.remove('cur-on'));
   document.addEventListener('mouseenter',()=>document.body.classList.add('cur-on'));
 }
-const interactive=t=>t.closest('button,a,input,textarea,label,.row,.card,.panel,.me');
+const interactive=t=>t.closest('button,a,input,textarea,label,.row,.card,.panel');
 addEventListener('pointerdown',e=>{ if(!state.entered||interactive(e.target)) return; holdStart={x:e.clientX,y:e.clientY}; holdTimer=setTimeout(()=>{state.hold=1; sfx.tick();},e.pointerType==='touch'?260:170); });
 const endHold=e=>{ clearTimeout(holdTimer); holdStart=null; state.hold=0; if(e && e.pointerType==='touch') mouse.in=false; };
 addEventListener('pointerup',endHold);
@@ -870,7 +884,8 @@ addEventListener('selectstart',e=>{ if(!e.target.closest||!e.target.closest('inp
 addEventListener('dragstart',e=>e.preventDefault());
 
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-play],[data-footage],[data-go],[data-row],#rewind'); if(!t) return;
+  const t=e.target.closest('[data-play],[data-footage],[data-share],[data-go],[data-row],#rewind'); if(!t) return;
+  if(t.dataset.share!==undefined){ shareClip(+t.dataset.share); return; }
   if(t.dataset.play!==undefined){ openTheater(+t.dataset.play); }
   else if(t.dataset.footage!==undefined){ openTheater(+t.dataset.footage); if(P[+t.dataset.footage].videoEl) setView('footage'); }
   else if(t.dataset.go!==undefined){ goTo(+t.dataset.go); }
@@ -962,7 +977,6 @@ function frame(now){
   const v=state.theater&&state.theater.videoEl; if(v&&v.duration) $('#thBar i').style.width=(v.currentTime/v.duration*100)+'%';
 
   renderer.render(scene,camera);
-  if(meView && active===0 && !state.theater) meView.render(dt,t);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -1003,61 +1017,6 @@ if(cform) cform.addEventListener('submit',async e=>{
   }catch(err){ btn.disabled=false; stat.textContent=CONFIG.email?`Couldn't send — email ${CONFIG.email} instead.`:`Couldn't send right now — try again in a minute.`; }
 });
 
-/* ---------- 3D portrait (drag to rotate) ---------- */
-// Three depth scans of the head (left, front, right). Each turns with real
-// parallax over its own range; dragging past it crossfades to the next scan.
-function initMe(){
-  const box=$('#me'); if(!box) return null;
-  const cv=$('canvas',box);
-  const VIEWS=[{n:'left',yaw:-1.2},{n:'front',yaw:0},{n:'right',yaw:1.2}];
-  const r=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:false}); r.setPixelRatio(DPR); r.setClearColor(0,0);
-  const sc=new THREE.Scene(), cam=new THREE.PerspectiveCamera(28,3/4,.1,50); cam.position.set(0,.55,6.4);
-  const st={yaw:0, pitch:0, vy:0, drag:null, hover:0, ready:false, views:[]};
-  const loadImg=src=>new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
-  const pix=img=>{ const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; const x=c.getContext('2d'); x.drawImage(img,0,0); return x.getImageData(0,0,c.width,c.height).data; };
-  const mk=()=>new THREE.ShaderMaterial({
-    uniforms:{uC0:U.uC0,uC1:U.uC1,uC2:U.uC2,uC3:U.uC3,uC4:U.uC4,uReveal:{value:0},uW:{value:0},uSize:{value:2},uTime:U.uTime},
-    transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending,
-    vertexShader:`attribute float aD; attribute float aR; attribute vec3 aCol; uniform float uW,uSize,uTime; varying float vD; varying vec3 vCol;
-      void main(){ vec3 p=position; vec3 j=vec3(aR,fract(aR*7.31),fract(aR*13.7))-.5; p+=j*(1.-uW)*(1.-uW)*.7; p.z+=sin(uTime*1.7+aR*30.)*.012;
-        vD=aD; vCol=aCol; vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(.6+aD*.6)*(7./-mv.z); }`,
-    fragmentShader:`uniform vec3 uC0,uC1,uC2,uC3,uC4; uniform float uReveal,uW; varying float vD; varying vec3 vCol;
-      vec3 ramp(float x){ x=clamp(x,0.,1.); if(x<.25) return mix(uC0,uC1,x/.25); if(x<.5) return mix(uC1,uC2,(x-.25)/.25); if(x<.75) return mix(uC2,uC3,(x-.5)/.25); return mix(uC3,uC4,(x-.75)/.25); }
-      void main(){ vec2 q=gl_PointCoord-.5; float rr=length(q); if(rr>.5) discard; vec3 c=mix(ramp(.08+vD*.72),vCol,uReveal); gl_FragColor=vec4(c,uW*(.62+.38*uReveal)*smoothstep(.5,.12,rr)); }`
-  });
-  Promise.all(VIEWS.map(v=>Promise.all([loadImg(`/me/me-${v.n}.jpg`),loadImg(`/me/me-${v.n}-depth.png`)]))).then(imgs=>{
-    imgs.forEach(([ci,di],k)=>{
-      const W=di.width, H=di.height, cd=pix(ci), dd=pix(di), step=IS_MOBILE?5:4, P=[],D=[],C=[],R=[];
-      for(let y=0;y<H;y+=step) for(let x=0;x<W;x+=step){ const i=(y*W+x)*4, d=dd[i]/255; if(d<.04) continue;
-        P.push((x/W-.5)*3, (.5-y/H)*4, (d-.55)*1.5); D.push(d); C.push(cd[i]/255,cd[i+1]/255,cd[i+2]/255); R.push(Math.random()); }
-      const g=new THREE.BufferGeometry();
-      g.setAttribute('position',new THREE.Float32BufferAttribute(P,3)); g.setAttribute('aD',new THREE.Float32BufferAttribute(D,1));
-      g.setAttribute('aCol',new THREE.Float32BufferAttribute(C,3)); g.setAttribute('aR',new THREE.Float32BufferAttribute(R,1));
-      const pts=new THREE.Points(g,mk()); pts.frustumCulled=false; sc.add(pts); st.views.push({...VIEWS[k],pts});
-    });
-    st.ready=true; box.hidden=false; size();
-  }).catch(()=>{});   // no portrait files → nothing shows
-  function size(){ const w=box.clientWidth, h=box.clientHeight; if(!w) return; r.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); }
-  addEventListener('resize',size);
-  box.addEventListener('pointerdown',e=>{ st.drag={x:e.clientX,y:e.clientY,yaw:st.yaw,pitch:st.pitch,t:performance.now()}; box.setPointerCapture(e.pointerId); sfx.tick(); });
-  box.addEventListener('pointermove',e=>{ if(!st.drag) return; const nyaw=clamp(st.drag.yaw+(e.clientX-st.drag.x)*.012,-1.6,1.6);
-    st.vy=(nyaw-st.yaw); st.yaw=nyaw; st.pitch=clamp(st.drag.pitch+(e.clientY-st.drag.y)*.006,-.35,.35); });
-  const up=()=>{ st.drag=null; }; box.addEventListener('pointerup',up); box.addEventListener('pointercancel',up);
-  box.addEventListener('pointerenter',()=>st.hover=1); box.addEventListener('pointerleave',()=>st.hover=0);
-  return { render(dt,t){
-    if(!st.ready) return;
-    if(cv.width!==Math.round(box.clientWidth*DPR) || cv.height!==Math.round(box.clientHeight*DPR)) size();
-    if(!st.drag){ st.yaw+=st.vy; st.vy*=.9;                       // fling, then drift back to a gentle sway
-      const home=Math.sin(t*.45)*.32; st.yaw+=(home-st.yaw)*(1-Math.pow(.35,dt)); st.pitch+=(Math.sin(t*.3)*.05-st.pitch)*(1-Math.pow(.2,dt)); }
-    const rev=Math.max(st.hover*.85,state.hold);
-    st.views.forEach(v=>{ const off=st.yaw-v.yaw, w=clamp(1.25-Math.abs(off)/.8,0,1);
-      v.pts.visible=w>.01; v.pts.rotation.set(st.pitch,clamp(off,-.7,.7),0);
-      const u=v.pts.material.uniforms; u.uW.value=w*w*(3-2*w); u.uSize.value=(IS_MOBILE?2.2:2.4)*DPR; u.uReveal.value+=(rev-u.uReveal.value)*.12;
-      const bl=state.light?THREE.NormalBlending:THREE.AdditiveBlending; if(v.pts.material.blending!==bl){ v.pts.material.blending=bl; v.pts.material.needsUpdate=true; } });
-    r.render(sc,cam);
-  } };
-}
-const meView=initMe();
 
 /* ---------- boot ---------- */
 (async()=>{
@@ -1065,22 +1024,21 @@ const meView=initMe();
   const bl=$('#blines'), bf=$('#bfill');
   const fontWait=(document.fonts&&document.fonts.load)?Promise.race([document.fonts.load('600 84px "Inter Tight"'),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
   for(let i=0;i<lines.length;i++){ await new Promise(r=>setTimeout(r,260)); bl.innerHTML+=lines[i]+'<br>'; bf.style.width=((i+1)/lines.length*100)+'%'; }
-  await fontWait; $('#enter').classList.add('ready');
+  await fontWait;
+  const linked=startHash && P.find(p=>slugOf(p.title)===startHash);
+  if(linked) $('#enter').textContent=`▶ Enter — straight to “${linked.title}”`;
+  $('#enter').classList.add('ready');
 })();
-function endLeader(){
-  if(!leader.on) return; leader.on=false; leader.timers.forEach(clearTimeout);
-  enterAt=performance.now(); sfx.beep(1000,.12,.06);
-  transitionTo(sections[active].spec,true,'flash');
+const startHash=decodeURIComponent(location.hash.slice(1));
+function jumpToLinked(){   // aviram.app#clip-name opens straight on that clip
+  const target=startHash && sections.findIndex(s=>sectionSlug(s)===startHash);
+  if(target>0){ sections[target].el.scrollIntoView({behavior:'instant'}); active=target; onActive(); }
 }
 $('#enter').onclick=()=>{
   state.entered=true; enterAt=performance.now(); sfx.init(); $('#boot').classList.add('gone'); document.body.classList.remove('locked');
   scrollTo(0,0); U.uScatter.value=.9; sendBeat();
-  // 3-2-1 film leader in dots, then cut to the reel
-  leader.on=true; leader.t0=performance.now();
-  S.a.spec={scene:'leader'}; S.curKey='leader|'; S.tween=false;
-  [0,1,2].forEach(i=>leader.timers.push(setTimeout(()=>sfx.beep(i===2?1200:900,.07,.04), i*leader.step*1000+30)));
-  leader.timers.push(setTimeout(endLeader, 3*leader.step*1000));
-  setTimeout(()=>addEventListener('pointerdown',endLeader,{once:true}),200);   // tap to skip
+  if(startHash) try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}
+  jumpToLinked();
 };
 } // main
 </script>

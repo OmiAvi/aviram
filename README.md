@@ -11,7 +11,6 @@ public/admin/index.html    /admin — edit clips, apps, profile; upload videos
 public/site.default.json   starting content, used until the first save in /admin
 public/videos/*.mp4        clips bundled with the first version (moved to R2 from /admin)
 public/depth/              real depth maps per clip (Depth Anything V2) + manifest.json
-public/me/                 the 3D head next to the name (photo + depth, three angles)
 scripts/depth.py           builds depth maps for new clips
 src/worker.js              API: login, content, uploads to R2, video streaming with Range
 wrangler.jsonc             Cloudflare config (R2 bucket, D1 stats db, aviram.app routes)
@@ -55,6 +54,12 @@ git add public/depth && git commit -m "Depth maps" && git push
 Or have GitHub do it automatically every 6 hours: add
 `scripts/depth-workflow.yml` to the repo as `.github/workflows/depth.yml`
 (on github.com: Add file → Create new file, paste it in).
+
+## Sharing
+
+- Link previews (LinkedIn, iMessage, X…) use `public/og.jpg` plus the meta tags in `index.html`.
+- Every clip has its own link, e.g. `aviram.app/#the-holy-war` (title in lowercase, dashes
+  for spaces). The address bar follows as you scroll, and each clip has a **Share** button.
 
 ## How it's wired
 
