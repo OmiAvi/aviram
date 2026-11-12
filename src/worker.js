@@ -220,7 +220,7 @@ async function serveBundledVideo(req, env, url) {
   const headers = new Headers({
     'content-type': res.headers.get('content-type') || 'video/mp4',
     'accept-ranges': 'bytes',
-    'cache-control': 'public, max-age=86400',
+    'cache-control': 'public, max-age=300, must-revalidate',
   });
   const etag = res.headers.get('etag');
   if (etag) headers.set('etag', etag);
