@@ -19,6 +19,12 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The name Omer rendered as a glowing orange 3D point cloud.">
+<meta property="og:video" content="https://aviram.app/videos/preview.mp4">
+<meta property="og:video:url" content="https://aviram.app/videos/preview.mp4">
+<meta property="og:video:secure_url" content="https://aviram.app/videos/preview.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1200">
+<meta property="og:video:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Omer Aviram — Depth Reel">
 <meta name="twitter:description" content="Video editor + developer. Every edit depth-scanned into 3D.">
@@ -36,7 +42,9 @@
 body.light{ --bg:#e7e4df; --fg:#140a04; --dim:rgba(20,10,4,.5); --line:rgba(20,10,4,.18); --panel:rgba(231,228,223,.62); }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-snap-type:y proximity;scroll-behavior:smooth}
-body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none;background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:12px;letter-spacing:.06em;overflow-x:hidden;transition:background .6s,color .6s;-webkit-font-smoothing:antialiased}
+/* touch screens: free scrolling (snap fights iOS momentum + the collapsing address bar) */
+@media (pointer:coarse){html{scroll-snap-type:none;scroll-behavior:auto}.sec{scroll-snap-align:none}}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:12px;letter-spacing:.06em;overflow-x:hidden;transition:background .6s,color .6s;-webkit-font-smoothing:antialiased}
 body.locked{overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;letter-spacing:inherit}
 a{color:inherit}
@@ -140,6 +148,13 @@ main{position:relative;z-index:10;transition:opacity .5s}
 .end h2 b{color:var(--accentText);font-style:italic;font-weight:500}
 .end p{color:var(--dim);margin:20px 0 26px;line-height:1.8}
 .end .links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.end .ptop{margin-bottom:10px}
+.end h2{font-size:clamp(56px,10vw,150px)!important;line-height:.9!important}
+.stats{display:flex;gap:clamp(20px,5vw,64px);justify-content:center;margin:26px 0 4px;text-transform:uppercase}
+.stats div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.stats b{font-family:var(--disp);font-weight:500;font-size:clamp(40px,6vw,76px);line-height:1;letter-spacing:-.04em;color:var(--accentText);text-shadow:0 0 24px var(--bg)}
+.stats span{font-size:10px;color:var(--dim)}
+.end p{text-shadow:0 0 14px var(--bg),0 0 4px var(--bg)}
 .end .copy{position:absolute;bottom:22px;font-size:10px;color:var(--dim)}
 
 /* ---------- theater ---------- */
@@ -486,7 +501,7 @@ function sparkle(c,t,amt){
 
 /* ---------- a depth source: procedural scene or a video ---------- */
 class Source{
-  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:true});
+  constructor(){ this.cv=document.createElement('canvas'); this.cv.width=SW; this.cv.height=SH; this.ctx=this.cv.getContext('2d',{willReadFrequently:matchMedia('(hover:hover) and (pointer:fine)').matches});
     this.tex=new THREE.CanvasTexture(this.cv); this.tex.minFilter=THREE.LinearFilter; this.tex.magFilter=THREE.LinearFilter; this.tex.generateMipmaps=false; this.spec={scene:'hero'}; }
   update(t){
     const c=this.ctx, v=this.spec.proj && this.spec.proj.videoEl;
@@ -638,7 +653,7 @@ function build(){
         <h2 class="ptitle">${esc(p.title)}</h2>
         <p class="pblurb">${esc(p.blurb)}</p>
         <dl class="specs"><div><dt>Year</dt><dd>${esc(p.year)}</dd></div><div><dt>Role</dt><dd>${esc(p.role)}</dd></div><div><dt>Runtime</dt><dd>${esc(p.runtime)}</dd></div></dl>
-        <div class="btns"><button class="btn primary" data-play="${i}">▶ Play scan</button>${p.videoEl?`<button class="btn" data-footage="${i}">▶ Play footage</button>`:''}</div>
+        <div class="btns">${p.videoEl?`<button class="btn primary" data-footage="${i}">▶ Play footage</button><button class="btn" data-play="${i}">▶ Play scan</button>`:`<button class="btn primary" data-play="${i}">▶ Play scan</button>`}</div>
         <div class="linked" data-linked="${i}"></div>
       </div>`,'proj'+(r?' r':''),{scene:p.scene,proj:p},p.title,
       {p:[r?-4.6:4.6, r?-1.2:1.2, 11.6], l:[r?.6:-.6,0,1]});
@@ -647,11 +662,18 @@ function build(){
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
        ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
-  const links=[...(CONFIG.links||[]).filter(l=>l.url).map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`)];
-  if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`);
-  add(`<h2>End of <b>tape.</b></h2><p>${esc(CONFIG.about)}</p>
-       <div class="links"><button class="btn" id="rewind">◀◀ Rewind</button>${links.join('')}</div>
-       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'End',{p:[0,0,24],l:[0,0,0]});
+  const IG='https://www.instagram.com/snapbackinterns/', LI='https://www.linkedin.com/in/omeraviram/';
+  const links=(CONFIG.links||[]).filter(l=>l.url && !/instagram\.com\/snapbackinterns|linkedin\.com\/in\/omeraviram/i.test(l.url))
+    .map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`);
+  if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${esc(CONFIG.email)}">✉ ${esc(CONFIG.email)}</a>`);
+  links.splice(CONFIG.email?1:0,0,`<a class="btn" href="${LI}" target="_blank" rel="noopener">LinkedIn ↗</a>`);
+  links.push(`<a class="btn" href="${IG}" target="_blank" rel="noopener">Instagram · @snapbackinterns ↗</a>`);
+  add(`<div class="ptop">Contact</div>
+       <h2>Let's make something <b>move.</b></h2>
+       <div class="stats"><div><b>24M</b><span>impressions</span></div><div><b>500K</b><span>likes</span></div><div><b>8</b><span>weeks</span></div></div>
+       <p>I reached 24 million impressions and 500K likes across social media platforms in 8 weeks.</p>
+       <div class="links">${links.join('')}<button class="btn" id="rewind">◀◀ Rewind</button></div>
+       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'Contact',{p:[0,0,24],l:[0,0,0]});
 
   const rail=$('#rail'); rail.innerHTML=sections.map((s,i)=>`<button data-go="${i}"><span>${pad(i+1)} ${esc(s.name)}</span><i></i></button>`).join('');
   $('#secTot').textContent=pad(sections.length);
