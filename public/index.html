@@ -148,6 +148,9 @@ main{position:relative;z-index:10;transition:opacity .5s}
 .end h2 b{color:var(--accentText);font-style:italic;font-weight:500}
 .end p{color:var(--dim);margin:20px 0 26px;line-height:1.8}
 .end .links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.end .ptop{margin-bottom:12px}
+.end h2{font-size:clamp(56px,10vw,150px)!important;line-height:.9!important;margin-bottom:30px}
+.end .links + .links{margin-top:10px}
 .sbi,.contact{align-items:center;justify-content:center}
 .sbi .panel{width:min(1000px,100%);padding:26px 28px}
 .sbi-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
@@ -674,31 +677,20 @@ function build(){
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
        ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
-  const IG='https://www.instagram.com/snapbackinterns/', LI='https://www.linkedin.com/in/omeraviram/', XU='https://x.com/omeraviramm';
+  const LI='https://www.linkedin.com/in/omeraviram/', XU='https://x.com/omeraviramm';
   const EMAIL=CONFIG.email||'omeravi2005@gmail.com';
 
-  // Snapback Interns: the stat + top videos from the summer (SBI_TOP fills the strip)
-  const SBI_TOP=[];   // e.g. { title:'…', video:'/videos/sbi-1.mp4', views:'3.1M' }
-  add(`<div class="sbi panel">
-       <div class="sbi-head"><div><div class="ptop">Snapback Interns · Summer 2026</div>
-         <p class="sbi-line">I reached <b>24 million impressions</b> and <b>500K likes</b> across social media platforms in <b>8 weeks</b>.</p></div>
-         <a class="btn" href="${IG}" target="_blank" rel="noopener">@snapbackinterns ↗</a></div>
-       <div class="stats"><div><b>24M</b><span>impressions</span></div><div><b>500K</b><span>likes</span></div><div><b>8</b><span>weeks</span></div></div>
-       ${SBI_TOP.length?`<div class="sbi-top">${SBI_TOP.map(v=>`<figure><video src="${esc(v.video)}" muted loop playsinline preload="metadata"></video><figcaption>${esc(v.title)}${v.views?` · ${esc(v.views)} views`:''}</figcaption></figure>`).join('')}</div>`:''}
-       </div>`,'sbi',{scene:'pulse'},'Snapback Interns',{p:[4,1.6,12],l:[0,0,0]});
-
   // Contact: just the links
-  const links=(CONFIG.links||[]).filter(l=>l.url && !/instagram\.com\/snapbackinterns|linkedin\.com\/in\/omeraviram|(x|twitter)\.com\/omeraviramm/i.test(l.url))
+  const links=(CONFIG.links||[]).filter(l=>l.url && !/linkedin\.com\/in\/omeraviram|(x|twitter)\.com\/omeraviramm/i.test(l.url))
     .map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`);
   links.unshift(`<a class="btn primary" href="mailto:${esc(EMAIL)}">✉ ${esc(EMAIL)}</a>`,
     `<a class="btn" href="${LI}" target="_blank" rel="noopener">LinkedIn ↗</a>`,
     `<a class="btn" href="${XU}" target="_blank" rel="noopener">X · @omeraviramm ↗</a>`);
-  add(`<div class="contact-in"><div class="ptop">Contact</div><div class="links">${links.join('')}</div></div>`,'contact',{scene:'field'},'Contact',{p:[0,4.5,11],l:[0,-.5,0]});
-
-  // End of tape
-  add(`<h2>End of <b>tape.</b></h2><p>${esc(CONFIG.about)}</p>
+  add(`<div class="ptop">Contact</div>
+       <h2>Let's make something <b>move.</b></h2>
+       <div class="links">${links.join('')}</div>
        <div class="links"><button class="btn" id="rewind">◀◀ Rewind</button></div>
-       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'End',{p:[0,0,24],l:[0,0,0]});
+       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'Contact',{p:[0,0,24],l:[0,0,0]});
 
   const rail=$('#rail'); rail.innerHTML=sections.map((s,i)=>`<button data-go="${i}"><span>${pad(i+1)} ${esc(s.name)}</span><i></i></button>`).join('');
   $('#secTot').textContent=pad(sections.length);
