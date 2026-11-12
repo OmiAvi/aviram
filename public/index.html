@@ -311,7 +311,7 @@ body.cur-hold #cur .ring::before{border-style:solid;animation-duration:1s}
     <button class="chip" id="thClose"><span class="lbl">Esc </span>✕ Close</button>
   </div>
   <div class="th-bot">
-    <div class="seg" id="thView"><button data-v="scan" class="on">Scan</button><button data-v="split">Split</button><button data-v="footage">Footage</button></div>
+    <div class="seg" id="thView"><button data-v="footage">Footage</button><button data-v="scan" class="on">Scan</button><button data-v="split">Split</button></div>
     <label class="slider">Depth <input type="range" id="thReveal" min="0" max="1" step="0.01" value="0"> Color</label>
     <button class="chip" id="thMute">Audio <i>On</i></button>
     <div id="thBar"><i></i></div>
@@ -662,11 +662,13 @@ function build(){
   add(`<div class="wrap"><div class="shead"><h2>Also builds</h2><span>apps + series</span></div><div class="cards">
        ${CONFIG.apps.map((a,i)=>{const tag=a.url?'a':'div'; return `<${tag} class="card panel" data-app="${i}" ${a.url?`href="${esc(a.url)}" target="_blank" rel="noopener"`:''}><small>${esc(a.tag)}</small><div><h3>${esc(a.name)}</h3><p>${esc(a.line)}</p></div><small>${a.url?(/apps\.apple\.com/.test(a.url)?'App Store':a.url.replace(/^https?:\/\//,'').replace(/\/$/,''))+' ↗':'&nbsp;'}</small></${tag}>`;}).join('')}
        </div></div>`,'apps',{scene:'field'},'Apps',{p:[-5,-2.2,11],l:[0,0,0]});
-  const IG='https://www.instagram.com/snapbackinterns/', LI='https://www.linkedin.com/in/omeraviram/';
-  const links=(CONFIG.links||[]).filter(l=>l.url && !/instagram\.com\/snapbackinterns|linkedin\.com\/in\/omeraviram/i.test(l.url))
+  const IG='https://www.instagram.com/snapbackinterns/', LI='https://www.linkedin.com/in/omeraviram/', XU='https://x.com/omeraviramm';
+  const EMAIL=CONFIG.email||'omeravi2005@gmail.com';
+  const links=(CONFIG.links||[]).filter(l=>l.url && !/instagram\.com\/snapbackinterns|linkedin\.com\/in\/omeraviram|(x|twitter)\.com\/omeraviramm/i.test(l.url))
     .map(l=>`<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`);
-  if(CONFIG.email) links.unshift(`<a class="btn primary" href="mailto:${esc(CONFIG.email)}">✉ ${esc(CONFIG.email)}</a>`);
-  links.splice(CONFIG.email?1:0,0,`<a class="btn" href="${LI}" target="_blank" rel="noopener">LinkedIn ↗</a>`);
+  links.unshift(`<a class="btn primary" href="mailto:${esc(EMAIL)}">✉ ${esc(EMAIL)}</a>`,
+    `<a class="btn" href="${LI}" target="_blank" rel="noopener">LinkedIn ↗</a>`,
+    `<a class="btn" href="${XU}" target="_blank" rel="noopener">X · @omeraviramm ↗</a>`);
   links.push(`<a class="btn" href="${IG}" target="_blank" rel="noopener">Instagram · @snapbackinterns ↗</a>`);
   add(`<div class="ptop">Contact</div>
        <h2>Let's make something <b>move.</b></h2>
