@@ -689,8 +689,7 @@ function build(){
   add(`<div class="ptop">Contact</div>
        <h2>Let's make something <b>move.</b></h2>
        <div class="links">${links.join('')}</div>
-       <div class="links"><button class="btn" id="rewind">◀◀ Rewind</button></div>
-       <div class="copy">© ${new Date().getFullYear()} ${esc(CONFIG.name)}</div>`,'end',{scene:'hero'},'Contact',{p:[0,0,24],l:[0,0,0]});
+       <div class="links"><button class="btn" id="rewind">◀◀ Rewind</button></div>`,'end',{scene:'hero'},'Contact',{p:[0,0,24],l:[0,0,0]});
 
   const rail=$('#rail'); rail.innerHTML=sections.map((s,i)=>`<button data-go="${i}"><span>${pad(i+1)} ${esc(s.name)}</span><i></i></button>`).join('');
   $('#secTot').textContent=pad(sections.length);
